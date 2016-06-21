@@ -22,7 +22,7 @@ r1headzappvar.run(['$rootScope', '$state','contentservice','$uibModal','$log',fu
             $rootScope.contentupdated = false;
             //var data=contentservice.getcontent( $rootScope.adminUrl+'listcontent');
             var myVar = setInterval(function () {
-                $rootScope.contentbasedata = contentservice.getcontent($rootScope.adminUrl + 'listcontent');
+                $rootScope.contentbasedata = contentservice.getcontent($rootScope.adminUrl + 'contentlist');
                 if (typeof ($rootScope.contentbasedata) != 'undefined') {
                     clearInterval(myVar);
                 }
@@ -44,16 +44,16 @@ r1headzappvar.run(['$rootScope', '$state','contentservice','$uibModal','$log',fu
                     else {
                         $rootScope.tempval.content = "<img src = nodeserver/uploads/" + value.content + " /> ";
                     }
-                    $rootScope.contentlist.splice(value.id, 0, $rootScope.tempval);
-                    $rootScope.conf[value.id] = $rootScope.tempval.content;
-                    $rootScope.contenttype[value.id] = $rootScope.tempval.ctype;
+                    $rootScope.contentlist.splice(value._id, 0, $rootScope.tempval);
+                    $rootScope.conf[value._id] = $rootScope.tempval.content;
+                    $rootScope.contenttype[value._id] = $rootScope.tempval.ctype;
 
-                    $rootScope[value.cname + value.id] = $rootScope.tempval;
+                    $rootScope[value.cname + value._id] = $rootScope.tempval;
                     //array.splice(2, 0, "three");
-                    if (value.parentid != 0) {
-                        $rootScope.conf[value.parentid] = $rootScope.tempval.content;
-                        $rootScope.contenttype[value.parentid] = $rootScope.tempval.ctype;
-                        $rootScope[value.cname + value.parentid] = $rootScope.tempval;
+                    if (value.parent_id != 0) {
+                        $rootScope.conf[value.parent_id] = $rootScope.tempval.content;
+                        $rootScope.contenttype[value.parent_id] = $rootScope.tempval.ctype;
+                        $rootScope[value.cname + value.parent_id] = $rootScope.tempval;
                     }
                 });
 
@@ -100,6 +100,8 @@ r1headzappvar.run(['$rootScope', '$state','contentservice','$uibModal','$log',fu
 
     $rootScope.opencontentmodal = function (size,id) {
 
+        console.log('in openmodal');
+
        if($rootScope.userid!=0) {
            var modalInstance = $uibModal.open({
                animation: $rootScope.animationsEnabled,
@@ -145,7 +147,7 @@ r1headzappvar.filter('startFrom', function () {
 r1headzappvar.directive('content',['$compile','$sce','$state','$rootScope', function($compile,$sce,$state,$rootScope) {
     var directive = {};
     directive.restrict = 'E';
-    directive.template = '<div class=contentbind ng-bind-html="student.content | sanitize123" editid="student.id| sanitize123"  ></div><button  class = editableicon editid="student.id| sanitize123" ng-click=editcontent("student.name")>Edit</button><div class=clearfix></div>';
+    directive.template = '<div class=contentbind ng-bind-html="student.content | sanitize123" editid="student._id| sanitize123"  ></div><button  class = editableicon editid="student._id| sanitize123" ng-click=editcontent("student.name")>Edit</button><div class=clearfix></div>';
 
     directive.scope = {
         student : "=name"
@@ -168,6 +170,7 @@ r1headzappvar.directive('content',['$compile','$sce','$state','$rootScope', func
               //  console.log('changed');
             });
             $(element).find('.editableicon').on( "click", function() {
+                //console.log('in edit event ..');
                 $rootScope.opencontentmodal('lg',$( this ).parent().attr('id'));
             });
 
@@ -703,7 +706,7 @@ r1headzappvar.controller('addcontent', function($compile,$scope,$state,$http,$co
         $http({
             method  : 'POST',
             async:   false,
-            url     : $scope.adminUrl+'adddata',
+            url     : $scope.adminUrl+'addcontent',
             data    : $.param($scope.form),  // pass in data as strings
             headers : { 'Content-Type': 'application/x-www-form-urlencoded' }
         }) .success(function(data) {
@@ -743,7 +746,7 @@ r1headzappvar.controller('contentlist', function($scope,$state,$http,$cookieStor
     $scope.filterResult = [];    $http({
         method  : 'GET',
         async:   false,
-        url     : $scope.adminUrl+'listcontent',
+        url     : $scope.adminUrl+'contentlist',
         // data    : $.param($scope.form),  // pass in data as strings
         headers : { 'Content-Type': 'application/x-www-form-urlencoded' }
     }) .success(function(data) {
@@ -759,15 +762,15 @@ r1headzappvar.controller('contentlist', function($scope,$state,$http,$cookieStor
             if(value.ctype == "html" || value.ctype=='text') {
                 $scope.tempval.content=JSON.parse(value.content);
             }
-            $scope.contentlist.splice(value.id,0,$scope.tempval);
+            $scope.contentlist.splice(value._id,0,$scope.tempval);
 
-            $scope.conf[value.id]= $scope.tempval.content;
-            $scope.contenttype[value.id]= $scope.tempval.ctype;
+            $scope.conf[value._id]= $scope.tempval.content;
+            $scope.contenttype[value._id]= $scope.tempval.ctype;
             //array.splice(2, 0, "three");
-            if(value.parentid!=0) {
+            if(value.parent_id!=0) {
 
-                $scope.conf[value.parentid]= $scope.tempval.content;
-                $scope.contenttype[value.parentid]= $scope.tempval.ctype;
+                $scope.conf[value.parent_id]= $scope.tempval.content;
+                $scope.contenttype[value.parent_id]= $scope.tempval.ctype;
             }
         });
         console.log($scope.contentlist);
@@ -826,6 +829,7 @@ r1headzappvar.controller('contentlist', function($scope,$state,$http,$cookieStor
 
 r1headzappvar.controller('editcontent', function(contentservice,$compile,$scope,$state,$http,$cookieStore,$rootScope,Upload,$sce,$stateParams,$uibModalInstance,items) {
 
+    console.log('6789');
     $scope.ok = function () {
         $uibModalInstance.close();
     };
@@ -856,10 +860,10 @@ r1headzappvar.controller('editcontent', function(contentservice,$compile,$scope,
             cname: data[data.length-1].cname,
             ctype: data[data.length-1].ctype,
             description: data[data.length-1].description,
-            parentid:data[data.length-1].id
+            parent_id:data[data.length-1]._id
         }
 
-        if(data[data.length-1].parentid!=0) $scope.form.parentid=data[data.length-1].parentid;
+        if(data[data.length-1].parent_id!=0) $scope.form.parent_id=data[data.length-1].parent_id;
         if(data[data.length-1].ctype!='image') {
             data[data.length-1].content = JSON.parse(data[data.length-1].content);
 
@@ -1115,7 +1119,7 @@ r1headzappvar.controller('editcontent', function(contentservice,$compile,$scope,
         $http({
             method  : 'POST',
             async:   false,
-            url     : $scope.adminUrl+'adddata',
+            url     : $scope.adminUrl+'addcontent',
             data    : $.param($scope.form),  // pass in data as strings
             headers : { 'Content-Type': 'application/x-www-form-urlencoded' }
         }) .success(function(data) {
@@ -1168,10 +1172,10 @@ r1headzappvar.controller('editcontent', function(contentservice,$compile,$scope,
             cname: $scope.contenetselected.cname,
             ctype: $scope.contenetselected.ctype,
             description: $scope.contenetselected.description,
-            parentid:$scope.contenetselected.id
+            parent_id:$scope.contenetselected._id
         }
 
-        if($scope.contenetselected.parentid!=0) $scope.form.parentid=$scope.contenetselected.parentid;
+        if($scope.contenetselected.parent_id!=0) $scope.form.parent_id=$scope.contenetselected.parent_id;
         if($scope.contenetselected.ctype!='image') {
             console.log($scope.contenetselected.content);
             console.log($scope.contenetselected.content[0]);

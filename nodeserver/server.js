@@ -11,7 +11,7 @@ var express = require('express');
 var app = express();
 //app.use(busboy());// create our app w/ express
 //var mongoose = require('mongoose'); 				// mongoose for mongodb
-var port = process.env.PORT || 8022; 				// set the port
+var port = process.env.PORT || 1033; 				// set the port
 //var database = require('./config/database'); 			// load the database config
 //var morgan = require('morgan');
 /*var bodyParser = require('body-parser');
@@ -101,38 +101,7 @@ var url = 'mongodb://localhost:27017/testdb';
 
 var MongoClient = mongodb.MongoClient;
 
-// Use connect method to connect to the Server
-MongoClient.connect(url, function (err, db) {
-    if (err) {
-        console.log('Unable to connect to the mongoDB server. Error:', err);
-    } else {
-        //HURRAY!! We are connected. :)
-        console.log('Connection established to', url);
 
-
-        var collection = db.collection('users');
-
-        //Create some users
-        var user1 = {name: 'modulus admin', age: 42, roles: ['admin', 'moderator', 'user']};
-        var user2 = {name: 'modulus user', age: 22, roles: ['user']};
-        var user3 = {name: 'modulus super admin', age: 92, roles: ['super-admin', 'admin', 'moderator', 'user']};
-
-        // Insert some users
-        collection.insert([user1, user2, user3], function (err, result) {
-            if (err) {
-                console.log(err);
-                console.log('err-----mingo .. vag ');
-            } else {
-                console.log('Inserted %d documents into the "users" collection. The documents inserted with "_id" are:', result.length, result);
-            }
-        });
-
-        // do some work here with the database.
-
-        //Close connection
-        //db.close();
-    }
-});
 
 
 /*var mysql=require('mysql');
@@ -169,13 +138,84 @@ app.get('/',function(req,resp){
 
     });*/
 
-    resp.send(JSON.stringify('4545'));
+
+
+
+    // Use connect method to connect to the Server
+    MongoClient.connect(url, function (err, db) {
+        if (err) {
+            console.log('Unable to connect to the mongoDB server. Error:', err);
+        } else {
+            //HURRAY!! We are connected. :)
+            console.log('Connection established to mongo db', url);
+
+
+            var collection = db.collection('users');
+
+            //Create some users
+            var user1 = {name: 'modulus admin', age: 42, roles: ['admin', 'moderator', 'user']};
+            var user2 = {name: 'modulus user', age: 22, roles: ['user']};
+            var user3 = {name: 'modulus super admin', age: 92, roles: ['super-admin', 'admin', 'moderator', 'user']};
+
+            // Insert some users
+            collection.insert([user1, user2, user3], function (err, result) {
+                if (err) {
+                    console.log(err);
+                    console.log('err-----mingo .. vag ');
+                } else {
+                    //console.log('Inserted %d documents into the "users" collection. The documents inserted with "_id" are:', result.length, result);
+                    ///resp.send(JSON.stringify(collection.find()));
+
+                    /*collection.find({},function(err,docs){
+
+                        console.log(docs.name);
+
+                    });*/
+                    var dbresults= [];
+
+                    collection.find().toArray(function(err, items) {
+
+                        console.log(items);
+                        console.log('-----------------------------------');
+                        console.log(items.length);
+                        resp.send(JSON.stringify(items));
+                        ///dbresults.push(items);
+                    });
+
+                    /*console.log(dbresults);
+                    resp.send(JSON.stringify(dbresults));*/
+
+                    /*var findRestaurants = function(db, callback) {
+                        var cursor =collection('users').find();
+                        //resp.send(JSON.stringify(cursor));
+                        cursor.each(function(err, doc) {
+                            assert.equal(err, null);
+                            if (doc != null) {
+                                console.log(doc);
+                            } else {
+                                console.log('cb again');
+                                callback();
+                            }
+                        });
+                    };*/
+                    //db.close();
+                }
+            });
+
+            // do some work here with the database.
+
+            //Close connection
+            //db.close();
+        }
+    });
+
+    //resp.send(JSON.stringify('4545'));
 });
 
 
 
-app.get('/listcontent', function (req, resp) {
-    connection.query("SELECT * FROM contentmanager ",function(error,rows,fields){
+app.get('/contentlist', function (req, resp) {
+    /*connection.query("SELECT * FROM contentmanager ",function(error,rows,fields){
 
         if(!!error) console.log('error in db call ');
         else{
@@ -185,7 +225,52 @@ app.get('/listcontent', function (req, resp) {
             resp.send(JSON.stringify(rows));
         }
 
+    });*/
+
+
+
+
+
+    MongoClient.connect(url, function (err, db) {
+        if (err) {
+            console.log('Unable to connect to the mongoDB server. Error:', err);
+        } else {
+            //HURRAY!! We are connected. :)
+            console.log('Connection established to mongo db', url);
+
+
+            var collection = db.collection('content_table_allanschuman');
+
+            //Create some users
+            var user1 = {name: 'modulus admin', age: 42, roles: ['admin', 'moderator', 'user']};
+            var user2 = {name: 'modulus user', age: 22, roles: ['user']};
+            var user3 = {name: 'modulus super admin', age: 92, roles: ['super-admin', 'admin', 'moderator', 'user']};
+
+            // fetch some users
+
+
+            collection.find().toArray(function(err, items) {
+
+                console.log(items);
+                console.log('-----------------------------------');
+                console.log(items.length);
+                resp.send(JSON.stringify(items));
+                ///dbresults.push(items);
+            });
+
+
+
+
+            // do some work here with the database.
+
+            //Close connection
+            //db.close();
+        }
     });
+
+
+
+
 });
 
 
@@ -207,20 +292,14 @@ app.get('/contentlistbyid/:id', function (req, resp) {
 
 
 
-app.post('/adddata', function (req, resp) {
+app.post('/addcontent', function (req, resp) {
 
 
 
    /* res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Headers", "X-Requested-With");
 */
-    resp.header('Content-type: text/html');
-    resp.header("Access-Control-Allow-Origin", "*");  //I have also tried the * wildcard and get the same response
-    resp.header("Access-Control-Allow-Credentials: true");
-    resp.header('Access-Control-Allow-Methods: GET, PUT, POST, DELETE, OPTIONS');
-    resp.header('Access-Control-Max-Age: 1000');
-    resp.header('Access-Control-Allow-Headers: Content-Type, Content-Range, Content-Disposition, Content-Description');
-    //resp.send(('name : '+req.body.cname+' content:' +req.body.ctext+' ctype : '+req.body.ctype+'desc :'+req.body.description));
+
     var content='';
     if(req.body.ctype=='html') content= (req.body.chtml);
     if(req.body.ctype=='text') content= (req.body.ctext);
@@ -233,7 +312,50 @@ app.post('/adddata', function (req, resp) {
 
     value1 = {cname: req.body.cname, content: content, ctype: req.body.ctype,description:req.body.description,parentid:parentid,addtime:addtime};
 console.log("Insert command");
-connection.query('INSERT INTO contentmanager SET ?', value1, function (err,result) {
+
+
+
+    MongoClient.connect(url, function (err, db) {
+        if (err) {
+            console.log('Unable to connect to the mongoDB server. Error:', err);
+        } else {
+            //HURRAY!! We are connected. :)
+            console.log('Connection established to mongo db', url);
+
+
+            var collection = db.collection('content_table_allanschuman');
+
+            //Create some users
+            /*var user1 = {name: 'modulus admin', age: 42, roles: ['admin', 'moderator', 'user']};
+            var user2 = {name: 'modulus user', age: 22, roles: ['user']};
+            var user3 = {name: 'modulus super admin', age: 92, roles: ['super-admin', 'admin', 'moderator', 'user']};*/
+
+            // Insert some users
+            collection.insert([value1], function (err, result) {
+                if (err) {
+                    console.log(err);
+                    console.log('err-----mingo .. vag ');
+                } else {
+                    console.log('Inserted %d documents into the "users" collection. The documents inserted with "_id" are:', result.length, result);
+                    resp.send('Inserted %d documents into the "users" collection. The documents inserted with "_id" are:', result.length, result);
+
+                    //db.close();
+                    /*resp.send((req));*/
+                }
+            });
+
+            // do some work here with the database.
+
+            //Close connection
+            //db.close();
+        }
+    });
+
+
+
+
+
+/*connection.query('INSERT INTO contentmanager SET ?', value1, function (err,result) {
     if (err) {
         console.log("ERROR IN QUERY");
     } else {
@@ -241,7 +363,7 @@ connection.query('INSERT INTO contentmanager SET ?', value1, function (err,resul
         console.log('Inserted ' + result.affectedRows + ' rows');
         resp.send(result);
     }
-});
+});*/
     //resp.send((req));
 
 
