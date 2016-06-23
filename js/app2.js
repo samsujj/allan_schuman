@@ -804,6 +804,18 @@ app2.controller('home1', function($scope,$state,$cookieStore,$rootScope,contents
 
 });
 
+app2.controller('test', function($scope,$state,$cookieStore,$rootScope,contentservice) {
+
+$scope.name='iftekar uddin';
+
+});
+app2.controller('areasofexpertise', function($scope,$state,$cookieStore,$rootScope,contentservice) {
+
+
+
+}) ;
+
+
 app2.controller('ModalInstanceCtrl', function ($scope, $uibModalInstance, items) {
 
 

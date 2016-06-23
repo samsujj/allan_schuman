@@ -625,6 +625,32 @@ app.post('/roleupdates', function (req, resp) {
     });
 
 });
+app.post('/adminupdates', function (req, resp) {
+   MongoClient.connect(url, function (err, db) {
+        if (err) {
+            console.log('Unable to connect to the mongoDB server. Error:', err);
+        } else {
+            //HURRAY!! We are connected. :)
+
+            console.log('Connection established to mongo db', url);
+
+
+            var o_id = new mongodb.ObjectID(req.body.id);
+
+            var collection = db.collection('usertable');
+            collection.update({_id: o_id}, {$set: {fname: req.body.fname, lname: req.body.lname, email: req.body.email,address:req.body.address,phone_no:req.body.phone_no,mobile_no:req.body.mobile_no}},function(err, results) {
+                if (err){
+                    resp.send("failed");
+                    throw err;
+                }
+                else resp.send("success");
+            });
+
+
+        }
+    });
+
+});
 
 
 app.post('/upload',function(req, res){
