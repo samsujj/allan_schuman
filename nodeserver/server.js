@@ -478,7 +478,7 @@ app.post('/addadmin', function (req, resp) {
     var addtime=Date.now();
     var role_status=1;
 
-    value1 = {fname: req.body.fname, lname: req.body.lname, email: req.body.email,password:req.body.password,address:req.body.address,phone_no:req.body.phone_no,mobile_no:req.body.mobile_no,status:req.body.status,create_time:req.body.create_time};
+    value1 = {fname: req.body.fname, lname: req.body.lname, email: req.body.email,password:req.body.password,address:req.body.address,phone_no:req.body.phone_no,mobile_no:req.body.mobile_no,status:1,create_time:req.addtime};
     console.log("Insert command");
 
 
@@ -637,7 +637,7 @@ app.post('/adminupdates', function (req, resp) {
 
             var o_id = new mongodb.ObjectID(req.body.id);
 
-            var collection = db.collection('usertable');
+            var collection = db.collection('userstable');
             collection.update({_id: o_id}, {$set: {fname: req.body.fname, lname: req.body.lname, email: req.body.email,address:req.body.address,phone_no:req.body.phone_no,mobile_no:req.body.mobile_no}},function(err, results) {
                 if (err){
                     resp.send("failed");
