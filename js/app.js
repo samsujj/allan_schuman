@@ -1,7 +1,16 @@
 'use strict';
 
+
+function canJSON(value) {
+    try {
+        JSON.stringify(value);
+        return true;
+    } catch (ex) {
+        return false;
+    }
+}
 /* App Module */
-var r1headzappvar = angular.module('r1headzapp', ['app2','user_module_app','admin_module_app','ui.router','angularValidator','ngCookies','ui.bootstrap','ngFileUpload','ui.tinymce']);
+var r1headzappvar = angular.module('r1headzapp', ['app2','user_module_app','admin_module_app','media_module_app','ui.router','angularValidator','ngCookies','ui.bootstrap','ngFileUpload','ui.tinymce','youtube-embed']);
 
 r1headzappvar.run(['$rootScope', '$state','contentservice','$uibModal','$log',function($rootScope, $state,contentservice,$uibModal,$log){
 
@@ -33,11 +42,17 @@ r1headzappvar.run(['$rootScope', '$state','contentservice','$uibModal','$log',fu
                     //console.log(value.type);
                     $rootScope.tempval = value;
                     if (value.ctype == "html" || value.ctype == 'text') {
-                        $rootScope.tempval.content = JSON.parse(value.content);
-                        $rootScope.contentvalue = '';
-                        angular.forEach($rootScope.tempval.content, function (value1, key1) {
-                            $rootScope.contentvalue += value1;
-                        });
+                        console.log(value.content);
+                        console.log(typeof (value.content));
+                        if(canJSON(value.content)) {
+                            $rootScope.tempval.content = JSON.parse(value.content);
+
+                            $rootScope.contentvalue = '';
+                            angular.forEach($rootScope.tempval.content, function (value1, key1) {
+                                $rootScope.contentvalue += value1;
+                            });
+                        }
+                        else $rootScope.contentvalue = value.content;
 
                         $rootScope.tempval.content = $rootScope.contentvalue;
                     }
@@ -50,10 +65,10 @@ r1headzappvar.run(['$rootScope', '$state','contentservice','$uibModal','$log',fu
 
                     $rootScope[value.cname + value._id] = $rootScope.tempval;
                     //array.splice(2, 0, "three");
-                    if (value.parent_id != 0) {
-                        $rootScope.conf[value.parent_id] = $rootScope.tempval.content;
-                        $rootScope.contenttype[value.parent_id] = $rootScope.tempval.ctype;
-                        $rootScope[value.cname + value.parent_id] = $rootScope.tempval;
+                    if (value.parentid!=0 ) {
+                        $rootScope.conf[value.parentid] = $rootScope.tempval.content;
+                        $rootScope.contenttype[value.parentid] = $rootScope.tempval.ctype;
+                        $rootScope[value.cname + value.parentid] = $rootScope.tempval;
                     }
                 });
 
@@ -394,6 +409,53 @@ r1headzappvar.config(function($stateProvider, $urlRouterProvider,$locationProvid
                 }
             }
         )
+        .state('media-video',{
+                url:"/media-video",
+                views: {
+
+                    'content': {
+                        templateUrl: 'partial/media_video.html' ,
+                        controller: 'mediavideo'
+                    },
+                    'header': {
+                        templateUrl: 'partial/header.html' ,
+                        controller: 'header'
+                    },
+                    'footer': {
+                        templateUrl: 'partial/footer.html' ,
+                        controller: 'header'
+                    },
+                    'modalview': {
+                        templateUrl: 'partial/modalview.html' ,
+                        controller: 'mediavideo'
+                    },
+                }
+            }
+        )
+
+        .state('probono',{
+                url:"/probono",
+                views: {
+
+                    'content': {
+                        templateUrl: 'partial/probono.html' ,
+                        controller: 'probono'
+                    },
+                    'header': {
+                        templateUrl: 'partial/header.html' ,
+                        controller: 'header'
+                    },
+                    'footer': {
+                        templateUrl: 'partial/footer.html' ,
+                        controller: 'header'
+                    },
+                    'modalview': {
+                        templateUrl: 'partial/modalview.html' ,
+                        controller: 'probono'
+                    },
+                }
+            }
+        )
         .state('t2',{
             url:"/t2",
             views: {
@@ -464,6 +526,77 @@ r1headzappvar.config(function($stateProvider, $urlRouterProvider,$locationProvid
             }
         )
 
+        .state('media-list',{
+                url:"/media-list",
+                views: {
+
+                    'admin_header': {
+                        templateUrl: 'partial/admin_top_menu.html' ,
+                        controller: 'admin_header'
+                    },
+                    'admin_left': {
+                        templateUrl: 'partial/admin_left.html' ,
+                        //  controller: 'admin_left'
+                    },
+                    'admin_footer': {
+                        templateUrl: 'partial/admin_footer.html' ,
+                    },
+                    'content': {
+                        templateUrl: 'partial/media_list.html' ,
+                        controller: 'medialist'
+                    },
+
+                }
+            }
+        )
+
+        .state('add-media',{
+                url:"/add-media",
+                views: {
+
+                    'admin_header': {
+                        templateUrl: 'partial/admin_top_menu.html' ,
+                        controller: 'admin_header'
+                    },
+                    'admin_left': {
+                        templateUrl: 'partial/admin_left.html' ,
+                        //  controller: 'admin_left'
+                    },
+                    'admin_footer': {
+                        templateUrl: 'partial/admin_footer.html' ,
+                    },
+                    'content': {
+                        templateUrl: 'partial/add_media.html' ,
+                        controller: 'addmedia'
+                    },
+
+                }
+            }
+        )
+
+        .state('edit-media',{
+                url:"/edit-media/:mediaid",
+                views: {
+
+                    'admin_header': {
+                        templateUrl: 'partial/admin_top_menu.html' ,
+                        controller: 'admin_header'
+                    },
+                    'admin_left': {
+                        templateUrl: 'partial/admin_left.html' ,
+                    },
+                    'admin_footer': {
+                        templateUrl: 'partial/admin_footer.html' ,
+                    },
+                    'content': {
+                        templateUrl: 'partial/edit_media.html' ,
+                        controller: 'editmedia'
+                    },
+
+                }
+            }
+        )
+
         .state('admin-list',{
                 url:"/admin-list",
                 views: {
@@ -487,6 +620,7 @@ r1headzappvar.config(function($stateProvider, $urlRouterProvider,$locationProvid
                 }
             }
         )
+
 
         .state('addcontent',{
             url:"/add-content",
@@ -823,7 +957,7 @@ r1headzappvar.controller('addcontent', function($compile,$scope,$state,$http,$co
             data:{file:file} //pass file as data, should be user ng-model
         }).then(function (response) { //upload function returns a promise
             if(response.data.error_code === 0){ //validate success
-                //$window.alert('Success ' + resp.config.data.file.name + 'uploaded. Response: ');
+                //console.log('Success ' + resp.config.data.file.name + 'uploaded. Response: ');
 
                 console.log(response.data.filename);
 
@@ -852,11 +986,11 @@ r1headzappvar.controller('addcontent', function($compile,$scope,$state,$http,$co
 
                 //$('#loaderDiv').addClass('ng-hide');
             } else {
-                $window.alert('an error occured');
+                console.log('an error occured');
             }
         }, function (resp) { //catch error
             console.log('Error status: ' + resp.status);
-            $window.alert('Error status: ' + resp.status);
+            console.log('Error status: ' + resp.status);
         }, function (evt) {
             console.log(evt);
             var progressPercentage = parseInt(100.0 * evt.loaded / evt.total);
@@ -991,10 +1125,10 @@ r1headzappvar.controller('contentlist', function($scope,$state,$http,$cookieStor
             $scope.conf[value._id]= $scope.tempval.content;
             $scope.contenttype[value._id]= $scope.tempval.ctype;
             //array.splice(2, 0, "three");
-            if(value.parent_id!=0) {
+            if(value.parentid!=0) {
 
-                $scope.conf[value.parent_id]= $scope.tempval.content;
-                $scope.contenttype[value.parent_id]= $scope.tempval.ctype;
+                $scope.conf[value.parentid]= $scope.tempval.content;
+                $scope.contenttype[value.parentid]= $scope.tempval.ctype;
             }
         });
         console.log($scope.contentlist);
@@ -1077,6 +1211,10 @@ r1headzappvar.controller('editcontent', function(contentservice,$compile,$scope,
         headers : { 'Content-Type': 'application/x-www-form-urlencoded' }
     }) .success(function(data) {
         console.log(data.length);
+        console.log('===============');
+        console.log(data[data.length-1]._id);
+        console.log('....................');
+        console.log(data);
         //console.log($scope.form);
         console.log('after form');
         $rootScope.currentlistdata=data;
@@ -1084,10 +1222,14 @@ r1headzappvar.controller('editcontent', function(contentservice,$compile,$scope,
             cname: data[data.length-1].cname,
             ctype: data[data.length-1].ctype,
             description: data[data.length-1].description,
-            parent_id:data[data.length-1]._id
+            parentid:data[data.length-1]._id
         }
 
-        if(data[data.length-1].parent_id!=0) $scope.form.parent_id=data[data.length-1].parent_id;
+        console.log('888');
+        console.log($scope.form);
+        console.log('$$$$$$$$$$$$$$');
+        console.log(data[data.length-1]._id);
+        if( (data[data.length-1].parentid)!=0) $scope.form.parentid=data[data.length-1].parentid;
         if(data[data.length-1].ctype!='image') {
             data[data.length-1].content = JSON.parse(data[data.length-1].content);
 
@@ -1255,7 +1397,7 @@ r1headzappvar.controller('editcontent', function(contentservice,$compile,$scope,
             data:{file:file} //pass file as data, should be user ng-model
         }).then(function (response) { //upload function returns a promise
             if(response.data.error_code === 0){ //validate success
-                //$window.alert('Success ' + resp.config.data.file.name + 'uploaded. Response: ');
+                //console.log('Success ' + resp.config.data.file.name + 'uploaded. Response: ');
 
                 console.log(response.data.filename);
 
@@ -1283,11 +1425,11 @@ r1headzappvar.controller('editcontent', function(contentservice,$compile,$scope,
                 $rootScope.stateIsLoading = false;
 
             } else {
-                $window.alert('an error occured');
+                console.log('an error occured');
             }
         }, function (resp) { //catch error
             console.log('Error status: ' + resp.status);
-            $window.alert('Error status: ' + resp.status);
+            console.log('Error status: ' + resp.status);
         }, function (evt) {
             console.log(evt);
             var progressPercentage = parseInt(100.0 * evt.loaded / evt.total);
@@ -1361,6 +1503,7 @@ r1headzappvar.controller('editcontent', function(contentservice,$compile,$scope,
             }
         });
 
+
     }
 
     $scope.iseditableformon=true
@@ -1396,10 +1539,10 @@ r1headzappvar.controller('editcontent', function(contentservice,$compile,$scope,
             cname: $scope.contenetselected.cname,
             ctype: $scope.contenetselected.ctype,
             description: $scope.contenetselected.description,
-            parent_id:$scope.contenetselected._id
+            parentid:$scope.contenetselected._id
         }
 
-        if($scope.contenetselected.parent_id!=0) $scope.form.parent_id=$scope.contenetselected.parent_id;
+        if($scope.contenetselected.parentid!=0) $scope.form.parentid=$scope.contenetselected.parentid;
         if($scope.contenetselected.ctype!='image') {
             console.log($scope.contenetselected.content);
             console.log($scope.contenetselected.content[0]);
