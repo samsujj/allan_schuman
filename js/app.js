@@ -456,6 +456,29 @@ r1headzappvar.config(function($stateProvider, $urlRouterProvider,$locationProvid
                 }
             }
         )
+        .state('contact',{
+                url:"/contact",
+                views: {
+
+                    'content': {
+                        templateUrl: 'partial/contact.html' ,
+                        controller: 'contact'
+                    },
+                    'header': {
+                        templateUrl: 'partial/header.html' ,
+                        controller: 'header'
+                    },
+                    'footer': {
+                        templateUrl: 'partial/contact_footer.html' ,
+                        controller: 'header'
+                    },
+                    'modalview': {
+                        templateUrl: 'partial/modalview.html' ,
+                        controller: 'contact'
+                    },
+                }
+            }
+        )
         .state('t2',{
             url:"/t2",
             views: {

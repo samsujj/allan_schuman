@@ -51,12 +51,19 @@
                       </thead>
                       <tbody>
 
-                      <tr ng-repeat=" item in contentlist track by item._id | filter:search" ng-if="item.parentid==0">
+                      <tr ng-repeat=" item in contentlist track by item._id | filter:search" >
+                       <!--   ng-if="item.parentid==0"-->
 
-                          <td>{{item.cname}}</td>
+                          <td>{{item.cname}}
+                          <br/>
+                              {{item._id}}
+                              <br/>
+                              {{item.parentid}}
+                          </td>
                           <!--<td ng-bind-html="item.content |sanitize123" class="editcontenttd"></td>-->
                           <td ng-if="contenttype[item._id]=='html' || contenttype[item._id]=='text' " >
                               <div ng-repeat=" item1 in conf[item._id] track by $index" ng-bind-html="item1 |sanitizelimit"></div> ..
+
                           </td>
                           <td ng-if="contenttype[item._id]=='image' "> <img src="nodeserver/uploads/{{conf[item._id]}}"></td>
                           <td> {{contenttype[item.id]}} </td>
