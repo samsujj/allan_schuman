@@ -10,7 +10,7 @@ function canJSON(value) {
     }
 }
 /* App Module */
-var r1headzappvar = angular.module('r1headzapp', ['app2','user_module_app','admin_module_app','media_module_app','ui.router','angularValidator','ngCookies','ui.bootstrap','ngFileUpload','ui.tinymce','youtube-embed']);
+var r1headzappvar = angular.module('r1headzapp', ['app2','user_module_app','admin_module_app','media_module_app','media_article_module_app','stuff_module_app','ui.router','angularValidator','ngCookies','ui.bootstrap','ngFileUpload','ui.tinymce','youtube-embed']);
 
 r1headzappvar.run(['$rootScope', '$state','contentservice','$uibModal','$log',function($rootScope, $state,contentservice,$uibModal,$log){
 
@@ -42,8 +42,8 @@ r1headzappvar.run(['$rootScope', '$state','contentservice','$uibModal','$log',fu
                     //console.log(value.type);
                     $rootScope.tempval = value;
                     if (value.ctype == "html" || value.ctype == 'text') {
-                        console.log(value.content);
-                        console.log(typeof (value.content));
+                       // console.log(value.content);
+                       // console.log(typeof (value.content));
                         if(canJSON(value.content)) {
                             $rootScope.tempval.content = JSON.parse(value.content);
 
@@ -85,7 +85,7 @@ r1headzappvar.run(['$rootScope', '$state','contentservice','$uibModal','$log',fu
                 day  = ("0" + date.getDate()),
                 hour  = ("0" + date.getHours()),
                 minute  = ("0" + date.getMinutes());
-            console.log(date);
+          //  console.log(date);
             return [ date.getFullYear(), mnth, day,hour,minute ].join("-");
             //return new Date(date).getTime() / 1000
         }
@@ -115,7 +115,7 @@ r1headzappvar.run(['$rootScope', '$state','contentservice','$uibModal','$log',fu
 
     $rootScope.opencontentmodal = function (size,id) {
 
-        console.log('in openmodal');
+      //  console.log('in openmodal');
 
       // if($rootScope.userid!=0) {
            console.log('in openmodal');
@@ -159,6 +159,19 @@ r1headzappvar.filter('startFrom', function () {
         return [];
     };
 });
+
+r1headzappvar.filter('limitHtml', ['$sce',function($sce) {
+        return function(text, limit) {
+
+            var changedString = String(text).replace(/<[^>]+>/gm, '');
+            var length = changedString.length;
+			var newStr = '';
+
+            newStr =  length > limit ? changedString.substr(0, limit - 1)+"..." : changedString;
+			
+			return $sce.trustAsHtml(newStr); 
+        }
+    }]);
 
 r1headzappvar.directive('content',['$compile','$sce','$state','$rootScope', function($compile,$sce,$state,$rootScope) {
     var directive = {};
@@ -239,7 +252,7 @@ r1headzappvar.config(function($stateProvider, $urlRouterProvider,$locationProvid
                 'modalview': {
                     templateUrl: 'partial/modalview.html' ,
                     controller: 'home'
-                },
+                }
             }
         }
     )
@@ -262,7 +275,7 @@ r1headzappvar.config(function($stateProvider, $urlRouterProvider,$locationProvid
                     'modalview': {
                         templateUrl: 'partial/modalview.html' ,
                         controller: 'test'
-                    },
+                    }
                 }
             }
         )
@@ -286,7 +299,7 @@ r1headzappvar.config(function($stateProvider, $urlRouterProvider,$locationProvid
                 'modalview': {
                     templateUrl: 'partial/modalview.html' ,
                     controller: 'home'
-                },
+                }
             }
         }
     )
@@ -310,7 +323,7 @@ r1headzappvar.config(function($stateProvider, $urlRouterProvider,$locationProvid
                 'modalview': {
                     templateUrl: 'partial/modalview.html' ,
                     controller: 'home'
-                },
+                }
             }
         }
     )
@@ -356,19 +369,19 @@ r1headzappvar.config(function($stateProvider, $urlRouterProvider,$locationProvid
                     },
                     'modalview': {
                         templateUrl: 'partial/modalview.html' ,
-                        controller: 'staff'
+                        //controller: 'staff'
                     },
                 }
             }
         )
 
         .state('staffdetails',{
-            url:"/staffdetails",
+            url:"/staff-details/:id/:name",
             views: {
 
                 'content': {
                     templateUrl: 'partial/staff_details.html' ,
-                    controller: 'staff'
+                    controller: 'staffdetails'
                 },
                 'header': {
                     templateUrl: 'partial/header.html' ,
@@ -380,7 +393,7 @@ r1headzappvar.config(function($stateProvider, $urlRouterProvider,$locationProvid
                 },
                 'modalview': {
                     templateUrl: 'partial/modalview.html' ,
-                    controller: 'staff'
+                    //controller: 'staffdetails'
                 },
             }
         }
@@ -404,13 +417,37 @@ r1headzappvar.config(function($stateProvider, $urlRouterProvider,$locationProvid
                     },
                     'modalview': {
                         templateUrl: 'partial/modalview.html' ,
+                        //controller: 'mediaarticles'
+                    },
+                }
+            }
+        )
+
+        .state('articles-details',{
+                url:"/articles-details/:id",
+                views: {
+
+                    'content': {
+                        templateUrl: 'partial/media_articles_details.html' ,
                         controller: 'mediaarticles'
+                    },
+                    'header': {
+                        templateUrl: 'partial/header.html' ,
+                        controller: 'header'
+                    },
+                    'footer': {
+                        templateUrl: 'partial/footer.html' ,
+                        controller: 'header'
+                    },
+                    'modalview': {
+                        templateUrl: 'partial/modalview.html' ,
+                        //controller: 'mediaarticles'
                     },
                 }
             }
         )
         .state('media-video',{
-                url:"/media-video",
+                url:"/media-videos",
                 views: {
 
                     'content': {
@@ -427,7 +464,7 @@ r1headzappvar.config(function($stateProvider, $urlRouterProvider,$locationProvid
                     },
                     'modalview': {
                         templateUrl: 'partial/modalview.html' ,
-                        controller: 'mediavideo'
+                        //controller: 'mediavideo'
                     },
                 }
             }
@@ -614,6 +651,148 @@ r1headzappvar.config(function($stateProvider, $urlRouterProvider,$locationProvid
                     'content': {
                         templateUrl: 'partial/edit_media.html' ,
                         controller: 'editmedia'
+                    },
+
+                }
+            }
+        )
+        .state('stuff-list',{
+                url:"/staff-list",
+                views: {
+
+                    'admin_header': {
+                        templateUrl: 'partial/admin_top_menu.html' ,
+                        controller: 'admin_header'
+                    },
+                    'admin_left': {
+                        templateUrl: 'partial/admin_left.html' ,
+                        //  controller: 'admin_left'
+                    },
+                    'admin_footer': {
+                        templateUrl: 'partial/admin_footer.html' ,
+                    },
+                    'content': {
+                        templateUrl: 'partial/stuff/stuff_list.html' ,
+                        controller: 'stufflist'
+                    },
+
+                }
+            }
+        )
+
+        .state('add-stuff',{
+                url:"/add-staff",
+                views: {
+
+                    'admin_header': {
+                        templateUrl: 'partial/admin_top_menu.html' ,
+                        controller: 'admin_header'
+                    },
+                    'admin_left': {
+                        templateUrl: 'partial/admin_left.html' ,
+                        //  controller: 'admin_left'
+                    },
+                    'admin_footer': {
+                        templateUrl: 'partial/admin_footer.html' ,
+                    },
+                    'content': {
+                        templateUrl: 'partial/stuff/add_stuff.html' ,
+                        controller: 'addstuff'
+                    },
+
+                }
+            }
+        )
+
+        .state('edit-stuff',{
+                url:"/edit-staff/:mediaid",
+                views: {
+
+                    'admin_header': {
+                        templateUrl: 'partial/admin_top_menu.html' ,
+                        controller: 'admin_header'
+                    },
+                    'admin_left': {
+                        templateUrl: 'partial/admin_left.html' ,
+                    },
+                    'admin_footer': {
+                        templateUrl: 'partial/admin_footer.html' ,
+                    },
+                    'content': {
+                        templateUrl: 'partial/stuff/edit_stuff.html' ,
+                        controller: 'editstuff'
+                    },
+
+                }
+            }
+        )
+
+
+        .state('article-list',{
+                url:"/article-list",
+                views: {
+
+                    'admin_header': {
+                        templateUrl: 'partial/admin_top_menu.html' ,
+                        controller: 'admin_header'
+                    },
+                    'admin_left': {
+                        templateUrl: 'partial/admin_left.html' ,
+                        //  controller: 'admin_left'
+                    },
+                    'admin_footer': {
+                        templateUrl: 'partial/admin_footer.html' ,
+                    },
+                    'content': {
+                        templateUrl: 'partial/media_list_article.html' ,
+                        controller: 'articlelist'
+                    },
+
+                }
+            }
+        )
+
+        .state('add-article',{
+                url:"/add-article",
+                views: {
+
+                    'admin_header': {
+                        templateUrl: 'partial/admin_top_menu.html' ,
+                        controller: 'admin_header'
+                    },
+                    'admin_left': {
+                        templateUrl: 'partial/admin_left.html' ,
+                        //  controller: 'admin_left'
+                    },
+                    'admin_footer': {
+                        templateUrl: 'partial/admin_footer.html' ,
+                    },
+                    'content': {
+                        templateUrl: 'partial/add_media_article.html' ,
+                        controller: 'addarticle'
+                    },
+
+                }
+            }
+        )
+
+        .state('edit-article',{
+                url:"/edit-article/:mediaid",
+                views: {
+
+                    'admin_header': {
+                        templateUrl: 'partial/admin_top_menu.html' ,
+                        controller: 'admin_header'
+                    },
+                    'admin_left': {
+                        templateUrl: 'partial/admin_left.html' ,
+                    },
+                    'admin_footer': {
+                        templateUrl: 'partial/admin_footer.html' ,
+                    },
+                    'content': {
+                        templateUrl: 'partial/edit_media_article.html' ,
+                        controller: 'editarticle'
                     },
 
                 }
@@ -1154,7 +1333,7 @@ r1headzappvar.controller('contentlist', function($scope,$state,$http,$cookieStor
                 $scope.contenttype[value.parentid]= $scope.tempval.ctype;
             }
         });
-        console.log($scope.contentlist);
+       // console.log($scope.contentlist);
         $scope.contentlistp = $scope.contentlist.slice($scope.begin, parseInt($scope.begin+$scope.perPage));
 
     });
