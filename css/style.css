@@ -300,7 +300,7 @@ a:focus {
 
 
 
-.footerblock1{ background:#000 url("../images/footerimg1.png") no-repeat center top; clear: both;}
+.footerblock1{ background:#182953 url("../images/footerimg1.png") no-repeat center top; clear: both;}
 
 
 
@@ -322,7 +322,7 @@ a:focus {
 
 
 
-.footerblock2{ width: 100%; background: url("../images/contact2bg.png") no-repeat center top; background-size: cover; padding: 75px 0;}
+.footerblock2{ width: 100%; background: url("../images/contact2bg.jpg") no-repeat center top; background-size: cover; padding: 75px 0;}
 
 
 
@@ -358,7 +358,7 @@ a:focus {
 
 
 
-.social_icon_block{ width: 199px; margin: 0 auto; margin-top: 20px;}
+.social_icon_block{ width: 199px; margin: 0 auto; margin-top: 30px;}
 
 
 
@@ -369,8 +369,10 @@ a:focus {
 .footerblock2 h5{ font-size: 14px; color: #ffffff; font-family:'OpenSans-Semibold'; text-align: center; margin: 30px 0 15px 0; padding: 0 5px;}
 
 
+.probonoblock2leftcontent{ margin-top: 21px; overflow: hidden; float: none;}
 
-.homebannerwrapper{ width: 100%; margin-top: 110px; background: url("../images/bannerborder.png") repeat-x left bottom; padding-bottom: 10px;}
+
+.homebannerwrapper{ width: 100%; margin-top: 110px; background: url("../images/bannerborder.png") repeat-x left bottom; padding-bottom: 10px; position: relative;}
 
 
 
@@ -392,6 +394,12 @@ a:focus {
 
 
 
+.homebannerblock1 h2{ text-align: center; overflow: hidden; margin: 0; padding: 160px 5px 0 5px; text-transform: uppercase; font-size:100px; color: #fff;  font-family:'Century-Regular'; text-shadow: 0 0 7px #000; }
+
+
+
+
+.homebannerblock_body{ width: 100%; position: absolute; top: 0; left: 0;}
 
 
 .homeaboutblock{ background:#ffffff; border-top: solid 10px #ffffff; border-bottom: solid 5px #000000;}
@@ -416,7 +424,7 @@ a:focus {
 
 
 
-.homeaboutblock3{ background: #1a1a1a; border-top: solid 5px #04b5ca;  border-bottom: solid 5px #04b5ca;}
+.homeaboutblock3{ background: #182953; border-top: solid 5px #04b5ca;  border-bottom: solid 5px #04b5ca;}
 
 
 
@@ -520,7 +528,7 @@ a:focus {
 
 
 
-.homeblock5_righttext{  background: url("../images/homeblock5_trbg.png"); width: 80%; margin: 0 auto; margin-top: 25%; padding: 30px;}
+.homeblock5_righttext{  background: url("../images/ma_bg3.png"); width: 80%; margin: 0 auto; margin-top: 25%; padding: 30px;}
 
 
 
@@ -574,11 +582,11 @@ a:focus {
 
 
 
-.homebottomblock{ border-bottom: solid 2px #000; margin-top: 50px;}
+.homebottomblock{ border-bottom: solid 2px #05003f; margin-top: 50px;}
 
 
 
-.homebottomblock .viewmorelink{ display: block; float: right; width: 134px; height: 36px; background: #000; text-align: center; line-height: 38px; font-size: 14px; color: #fff; color: #fff;     font-family:'OpenSans-Bold';}
+.homebottomblock .viewmorelink{ display: block; float: right; width: 134px; height: 36px; background: #05003f; text-align: center; line-height: 38px; font-size: 14px; color: #fff; color: #fff;     font-family:'OpenSans-Bold';}
 
 
 
@@ -652,7 +660,11 @@ a:focus {
 
 
 
-.mapostblock .mapost_link .fullread{ display: block; width: 110px; height: 32px; float: right; margin-top: 20px; background: #000; text-align: center; line-height: 32px; color: #fff; font-family:'OpenSans-Regular';}
+.mapostblock .mapost_link .fullread{ display: block; width: 110px; height: 32px; float: right; margin-top: 20px; background: #05003f; text-align: center; line-height: 32px; color: #fff; font-family:'OpenSans-Regular';}
+
+
+
+.mediaarticlesblockcontain .container .mediaarticlesblockright2{ width: 629px; float: right; height: 572px;  background: url("../images/ma_bg2.jpg") no-repeat center top; background-size: cover;}
 
 
 
@@ -1123,6 +1135,11 @@ a:focus {
     visibility: hidden !important;
 }
 
+.item.active img {
+    transition: transform 7000ms linear 0s;
+    /* This should be based on your carousel setting. For bs, it should be 5second*/
+    transform: scale(1.15, 1.15);
+}
 .item.active img {
     transition: transform 7000ms linear 0s;
     /* This should be based on your carousel setting. For bs, it should be 5second*/

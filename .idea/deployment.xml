@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="PublishConfigData" autoUpload="Always" serverName="allan schuman">
+  <component name="PublishConfigData" autoUpload="Always" serverName="allanschuman">
     <serverData>
-      <paths name="allan schuman">
+      <paths name="allanschuman">
         <serverdata>
           <mappings>
             <mapping deploy="/public_html/projects/allan_schuman" local="$PROJECT_DIR$" web="/" />

@@ -1187,7 +1187,10 @@ r1headzappvar.controller('homenew', function($compile,$scope,$state,$http,$cooki
 
 
         $('.item >.active > .homebannerblock').css('transition', 'transform 5000ms linear 0s').css('transform', 'scale(1.05, 1.05)');
+        $('#carousel-example-generic').hide();
 
+        $scope.valsc=0;
+        $('link[href="css/animate.min.css"]').prop('disabled', true);
         /*item.active .homebannerblock {
          transition: transform 5000ms linear 0s;
          *//* This should be based on your carousel setting. For bs, it should be 5second*//*
@@ -1198,13 +1201,93 @@ r1headzappvar.controller('homenew', function($compile,$scope,$state,$http,$cooki
             $('.item:first').addClass('active');
 
 
-            $("#myCarousel").carousel('destroy');
-            $('#carousel-example-generic').carousel({
-                interval: 8500
-            });
-            $('#carousel-example-generic').carousel('next');
+            //$("#myCarousel").carousel('destroy');
+            //$('#carousel-example-generic').carousel();
+            //$('#carousel-example-generic').carousel('next');
 
-        },5000);
+
+            var t;
+
+            var start = $('#carousel-example-generic').find('.active').attr('data-interval');
+            t = setTimeout("$('#carousel-example-generic').carousel({interval: 1000});", start-1000);
+
+            $('#carousel-example-generic').on('slid.bs.carousel', function (e) {
+
+                var slideFrom = $(this).find('.active').index();
+                var slideTo = $(e.relatedTarget).index();
+                var c=$('.item').length;
+                if(slideFrom==c-1) {
+                    //$('.item').eq(0).hide();
+                    /* $('.item').eq(0).removeClass('active');
+                     $('.item').eq(1).addClass('active');*/
+
+                    setTimeout(function(){
+                        $('#carousel-example-generic').carousel(1);
+                        $('link[href="css/animate.min.css"]').prop('disabled', true);
+
+                    },8100);
+                    //$('.item').eq(0).show();
+                    console.log(slideFrom+' => '+slideTo+'c=='+c+'slideFrom='+slideFrom);
+                }
+                if(slideFrom==1) {
+                    //$('.item').eq(0).hide();
+                    /* $('.item').eq(0).removeClass('active');
+                     $('.item').eq(1).addClass('active');*/
+
+                    setTimeout(function(){
+                        $('#carousel-example-generic').carousel(2);
+                        console.log(slideFrom+' => '+slideTo+'c=='+c+'slideFrom='+slideFrom+'ccccccccccccccccccc55');
+
+
+                    },8100);
+                    //$('.item').eq(0).show();
+
+                }
+
+                clearTimeout(t);
+                var duration = $(this).find('.active').attr('data-interval');
+
+                $('#carousel-example-generic').carousel('pause');
+                t = setTimeout("$('#carousel-example-generic').carousel();", duration-1000);
+            });
+
+
+            $('.carousel-control.right').on('click', function(){
+                clearTimeout(t);
+            });
+
+            $('.carousel-control.left').on('click', function() {
+                clearTimeout(t)
+            });
+
+            $('#carousel-example-generic').carousel(1);
+            $('#carousel-example-generic').carousel(1);
+            $('#carousel-example-generic').show();
+
+            var c=$('.item').length;
+
+            $('#carousel-example-generic').on('slide',function(e){
+                var slideFrom = $(this).find('.active').index();
+                var slideTo = $(e.relatedTarget).index();
+                if(slideFrom==c-2) {
+                    //$('.item').eq(0).hide();
+                    $('.item').eq(0).removeClass('active');
+                    $('.item').eq(1).addClass('active');
+                    $('#carousel-example-generic').carousel(1);
+                    //$('.item').eq(0).show();
+                    console.log(slideFrom+' => '+slideTo+'c=='+c+'slideFrom='+slideFrom+'ccccccccccccccc1');
+                }
+
+            });
+
+
+
+
+
+
+        },100);
+
+
 
 
     });
