@@ -34,7 +34,7 @@
                 <td valign="middle" align="left" class=" homeblock3_left" >
                     <div class="homeblock3_left_text">
 
-                    <content name='homeblock3text576b8099ae456a094e17825a' id='576b8099ae456a094e17825a' > </content>
+                        <content name='homeblock3text5new576d122cb8e1a2fa1221c6c7' id='576d122cb8e1a2fa1221c6c7' > </content>
 
                     </div>
 
@@ -57,7 +57,7 @@
 
     <h2><content name='homeblock4text1576b8d42cc40b095105c190d' id='576b8d42cc40b095105c190d' > </content></h2>
     <h3><content name='homeblock4text2576b8d69cc40b095105c190e' id='576b8d69cc40b095105c190e' > </content></h3>
-    <h4><content name='homeblock4text3576b8da6cc40b095105c190f' id='576b8da6cc40b095105c190f' > </content></h4>
+   <!-- <h4><content name='homeblock4text3576b8da6cc40b095105c190f' id='576b8da6cc40b095105c190f' > </content></h4>-->
 
     <ul>
         <li><span><content name='homeblock4li1576b8e0fcc40b095105c1910' id='576b8e0fcc40b095105c1910' > </content></span></li>
@@ -103,7 +103,7 @@
             <h4><content name='homeblock5_righttext1576bae28bacd72193e2858c2' id='576bae28bacd72193e2858c2' > </content></h4>
 
 <h5><content name='homeblock5_righttext2576bae46bacd72193e2858c3' id='576bae46bacd72193e2858c3' > </content></h5>
-            <a href="javascript:void(0)" class="homeaboutblock5_link">Learn More</a>
+            <a href="javascript:void(0)" class="homeaboutblock5_link"><content name='homeLearnMore2577103f9022e193a7aaf10b8' id='577103f9022e193a7aaf10b8' > </content></a>
 
 
 
@@ -124,21 +124,21 @@
 
 <div class="container-fluid homeaboutblock6">
     <div class="container">
-    <h2>Our Partners</h2>
-    <div class="our_partners_div">
-        <h2>Allan M. Shuman</h2>
-        <img src="../images/home6img1.jpg" class="partnersimg" >
-        <h3>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the
-            industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.
-            <br/> <br/>
-            It has survived not only five centuries,
-            but also the leap into electronic typesetting, remaining
-            essentially unchanged.</h3>
+    <h2><content name='homeOurPartners57710261c236cf2d5c8e6c57' id='57710261c236cf2d5c8e6c57' > </content></h2>
+    <div class="our_partners_div" ng-repeat="item in filterResult =( itemList | filter:{status:1,type:1,featured:1}) | limitTo:2 | orderBy:predicate:reverse">
+        <h2 ng-bind="item.title"></h2>
 
-        <div class="fullbio_box">   <a href="javascript:void(0)">Full Bio</a></div>
+        <div class="partnersimg">
+        <img ng-src="nodeserver/uploads/{{item.picture}}" >
+        </div>
+        <h3 ng-bind-html="item.description | limitHtml: 500"></h3>
+
+        <div class="fullbio_box">   <a ui-sref="staffdetails({id:item._id,name:getUrlName(item.title)})">Full Bio</a></div>
 
     </div>
-    <div class="our_partners_div">
+
+
+    <!--<div class="our_partners_div our_partners_divright">
     <h2>Jacq Wilson</h2>
         <img src="../images/home6img2.jpg" class="partnersimg" >
         <h3>Jacq  Wilson  has  devoted  his  entire  career  to  helping  accident victims when they have been injured, harmed or inconvenienced by the  negligence  of  others.<br/><br/>
@@ -147,7 +147,7 @@
 
         <div class="fullbio_box">   <a href="javascript:void(0)">Full Bio</a></div>
 
-    </div>
+    </div>-->
 
 
 
@@ -156,7 +156,7 @@
 
 
     <div class="homebottomblock">
-        <a href="javascript:void(0)" class="viewmorelink">VIEW MORE</a>
+        <a ui-sref="staff" class="viewmorelink"><content name='homebottomVIEWMORE5771046a9dc8ac6f7adf30b4' id='5771046a9dc8ac6f7adf30b4' > </content></a>
         <div class="clearfix"></div>
 
     </div>

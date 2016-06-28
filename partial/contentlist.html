@@ -36,17 +36,17 @@
                   <table ng-if="contentlist.length > 0" id="example1" class="table table-bordered table-striped">
                       <thead>
                       <tr>
-                          <th>Content Name</th>
-                          <th>Content </th>
-                          <th>Type </th>
+                          <th width="25%">Content Name</th>
+                          <th width="25%">Content </th>
+                          <th width="25%">Type </th>
                           <!-- <th>Last Name</th>
                         <th>Email</th>
                         <th>Phone Number</th>
                         <th>Mobile Number</th>
                         <th>Address</th>
                          <th>Status</th>-->
-                          <th>Description</th>
-                          <th>Action</th>
+                          <th width="25%">Description</th>
+                          <th width="25%">Action</th>
                       </tr>
                       </thead>
                       <tbody>
@@ -54,22 +54,22 @@
                       <tr ng-repeat=" item in contentlist track by item._id | filter:search" >
                        <!--   ng-if="item.parentid==0"-->
 
-                          <td>{{item.cname}}
+                          <td width="25%">{{item.cname}}
                           <br/>
                               {{item._id}}
                               <br/>
                               {{item.parentid}}
                           </td>
                           <!--<td ng-bind-html="item.content |sanitize123" class="editcontenttd"></td>-->
-                          <td ng-if="contenttype[item._id]=='html' || contenttype[item._id]=='text' " >
+                          <td  width="25%" ng-if="contenttype[item._id]=='html' || contenttype[item._id]=='text' " >
                               <div ng-repeat=" item1 in conf[item._id] track by $index" ng-bind-html="item1 |sanitizelimit"></div> ..
 
                           </td>
-                          <td ng-if="contenttype[item._id]=='image' "> <img src="nodeserver/uploads/{{conf[item._id]}}"></td>
-                          <td> {{contenttype[item.id]}} </td>
-                          <td> {{item.description |sanitizelimit}} </td>
+                          <td width="25%" ng-if="contenttype[item._id]=='image' "> <img src="nodeserver/uploads/{{conf[item._id]}}"></td>
+                          <td width="25%"> {{contenttype[item.id]}} </td>
+                          <td width="25%"> {{item.description |sanitizelimit}} </td>
                           <!--<td>{{item.description}}</td>-->
-                          <td> <a ui-sref="edit-content({id:item._id})" >Edit</a>
+                          <td width="25%"> <a ui-sref="edit-content({id:item._id})" >Edit</a>
                               <input id="foo{{item._id}}" type="text" style="width:0px;" value="<content name='{{item.cname}}{{item._id}}' id='{{item._id}}' > </content>">
                               <button class="btn" data-clipboard-action="copy" data-clipboard-target="#foo{{item._id}}">Copy</button>
 

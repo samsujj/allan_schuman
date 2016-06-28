@@ -2,6 +2,11 @@
  * Created by iftekar on 24/5/16.
  */
 
+//var CryptoJS = require("crypto-js");
+var CryptoJS = require("crypto-js/aes");
+
+
+
 
 var express = require('express');
 
@@ -35,10 +40,10 @@ var http = require('http').Server(app);
 
 
 var bodyParser = require('body-parser');
-app.use(bodyParser.json({ parameterLimit: 1000000,
-    limit: '50mb'}));
-app.use(bodyParser.urlencoded({ parameterLimit: 1000000,
-    limit: '50mb', extended: false}));
+app.use(bodyParser.json({ parameterLimit: 10000000,
+    limit: '90mb'}));
+app.use(bodyParser.urlencoded({ parameterLimit: 10000000,
+    limit: '90mb', extended: false}));
 var multer  = require('multer');
 var datetimestamp='';
 var filename='';
@@ -48,8 +53,9 @@ var storage = multer.diskStorage({ //multers disk storage settings
     },
     filename: function (req, file, cb) {
 
-        //console.log(file);
-        filename=file.originalname.split('.')[0].replace(' ','') + '-' + datetimestamp + '.' + file.originalname.split('.')[file.originalname.split('.').length -1];
+        console.log(file.originalname);
+        filename=file.originalname.split('.')[0].replace(/ /g,'') + '-' + datetimestamp + '.' + file.originalname.split('.')[file.originalname.split('.').length -1];
+        console.log(filename);
         cb(null, filename);
     }
 });
@@ -144,10 +150,10 @@ app.get('/',function(req,resp){
     // Use connect method to connect to the Server
     MongoClient.connect(url, function (err, db) {
         if (err) {
-            console.log('Unable to connect to the mongoDB server. Error:', err);
+         //   console.log('Unable to connect to the mongoDB server. Error:', err);
         } else {
             //HURRAY!! We are connected. :)
-            console.log('Connection established to mongo db', url);
+          //  console.log('Connection established to mongo db', url);
 
 
             var collection = db.collection('users');
@@ -160,8 +166,8 @@ app.get('/',function(req,resp){
             // Insert some users
             collection.insert([user1, user2, user3], function (err, result) {
                 if (err) {
-                    console.log(err);
-                    console.log('err-----mingo .. vag ');
+                  //  console.log(err);
+                //    console.log('err-----mingo .. vag ');
                 } else {
                     //console.log('Inserted %d documents into the "users" collection. The documents inserted with "_id" are:', result.length, result);
                     ///resp.send(JSON.stringify(collection.find()));
@@ -175,10 +181,20 @@ app.get('/',function(req,resp){
 
                     collection.find().toArray(function(err, items) {
 
-                        console.log(items);
-                        console.log('-----------------------------------');
-                        console.log(items.length);
-                        resp.send(JSON.stringify(items));
+                      //  console.log(items);
+                     //   console.log('-----------------------------------');
+                     //   console.log(items.length);
+
+                        var crypto = require('crypto');
+
+                        var secret = '123456';
+                        var hash = crypto.createHmac('sha256', secret)
+                            .update('I love cupcakes')
+                            .digest('hex');
+                        resp.send(hash);
+
+                       // resp.send(CryptoJS.AES.encrypt("123", "Key1"));
+
                         ///dbresults.push(items);
                     });
 
@@ -219,10 +235,10 @@ app.get('/contentlist', function (req, resp) {
 
     MongoClient.connect(url, function (err, db) {
         if (err) {
-            console.log('Unable to connect to the mongoDB server. Error:', err);
+          //  console.log('Unable to connect to the mongoDB server. Error:', err);
         } else {
             //HURRAY!! We are connected. :)
-            console.log('Connection established to mongo db', url);
+           // console.log('Connection established to mongo db', url);
 
 
             var collection = db.collection('content_table_allanschuman');
@@ -237,10 +253,11 @@ app.get('/contentlist', function (req, resp) {
 
             collection.find().toArray(function(err, items) {
 
-                console.log(items);
-                console.log('-----------------------------------');
-                console.log(items.length);
+             //   console.log(items);
+             //   console.log('-----------------------------------');
+            //    console.log(items.length);
                 resp.send(JSON.stringify(items));
+                db.close();
                 ///dbresults.push(items);
             });
 
@@ -276,11 +293,11 @@ app.get('/contentlistbyid/:id', function (req, resp) {
 
     MongoClient.connect(url, function (err, db) {
         if (err) {
-            console.log('Unable to connect to the mongoDB server. Error:', err);
+          //  console.log('Unable to connect to the mongoDB server. Error:', err);
         } else {
             //HURRAY!! We are connected. :)
 
-            console.log('Connection established to mongo db', url);
+         //   console.log('Connection established to mongo db', url);
 
 
             var o_id = new mongodb.ObjectID(req.params.id);
@@ -289,10 +306,11 @@ app.get('/contentlistbyid/:id', function (req, resp) {
 
             collection.find({$or: [ { _id: o_id }, { parentid: req.params.id } ]}).toArray(function(err, items) {
 
-                console.log(items);
-                console.log('-----------------------------------');
-                console.log(items.length);
+              //  console.log(items);
+             //   console.log('-----------------------------------');
+              //  console.log(items.length);
                 resp.send(JSON.stringify(items));
+                db.close();
 
             });
 
@@ -324,16 +342,16 @@ app.post('/addcontent', function (req, resp) {
     var addtime=Date.now();
 
     value1 = {cname: req.body.cname, content: content, ctype: req.body.ctype,description:req.body.description,parentid:parentid,addtime:addtime};
-console.log("Insert command");
+//console.log("Insert command");
 
 
 
     MongoClient.connect(url, function (err, db) {
         if (err) {
-            console.log('Unable to connect to the mongoDB server. Error:', err);
+          //  console.log('Unable to connect to the mongoDB server. Error:', err);
         } else {
             //HURRAY!! We are connected. :)
-            console.log('Connection established to mongo db', url);
+          //  console.log('Connection established to mongo db', url);
 
 
             var collection = db.collection('content_table_allanschuman');
@@ -346,12 +364,115 @@ console.log("Insert command");
             // Insert some users
             collection.insert([value1], function (err, result) {
                 if (err) {
-                    console.log(err);
-                    console.log('err-----mingo .. vag ');
+                 //   console.log(err);
+                 //   console.log('err-----mingo .. vag ');
                 } else {
-                    console.log('Inserted %d documents into the "users" collection. The documents inserted with "_id" are:', result.length, result);
+                  //  console.log('Inserted %d documents into the "users" collection. The documents inserted with "_id" are:', result.length, result);
                     resp.send('Inserted %d documents into the "users" collection. The documents inserted with "_id" are:', result.length, result);
 
+                    db.close();
+                    //db.close();
+                    /*resp.send((req));*/
+                }
+            });
+
+            // do some work here with the database.
+
+            //Close connection
+            //db.close();
+        }
+    });
+
+
+
+
+
+/*connection.query('INSERT INTO contentmanager SET ?', value1, function (err,result) {
+    if (err) {
+        console.log("ERROR IN QUERY");
+    } else {
+        console.log("Insertion Successful." + result);
+        console.log('Inserted ' + result.affectedRows + ' rows');
+        resp.send(result);
+    }
+});*/
+    //resp.send((req));
+
+
+});
+
+app.post('/addcontact', function (req, resp) {
+
+
+
+   /* res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "X-Requested-With");
+*/
+
+    var addtime=Date.now();
+
+    value1 = {address: req.body.address, comments: req.body.comments, email: req.body.email,fullname:req.body.fullname,interest:req.body.interest,phone:req.body.phone};
+//console.log("Insert command");
+
+
+
+    MongoClient.connect(url, function (err, db) {
+        if (err) {
+           // console.log('Unable to connect to the mongoDB server. Error:', err);
+        } else {
+            //HURRAY!! We are connected. :)
+          //  console.log('Connection established to mongo db', url);
+
+
+            var collection = db.collection('contacttable');
+
+            //Create some users
+            /*var user1 = {name: 'modulus admin', age: 42, roles: ['admin', 'moderator', 'user']};
+            var user2 = {name: 'modulus user', age: 22, roles: ['user']};
+            var user3 = {name: 'modulus super admin', age: 92, roles: ['super-admin', 'admin', 'moderator', 'user']};*/
+
+            // Insert some users
+            collection.insert([value1], function (err, result) {
+                if (err) {
+                  //  console.log(err);
+                  //  console.log('err-----mingo .. vag ');
+                } else {
+                  //  console.log('Inserted %d documents into the "users" collection. The documents inserted with "_id" are:', result.length, result);
+                    resp.send('Inserted %d documents into the "users" collection. The documents inserted with "_id" are:', result.length, result);
+
+
+                    var mailer = require("nodemailer");
+
+                    // Use Smtp Protocol to send Email
+                    var smtpTransport = mailer.createTransport("SMTP",{
+                        service: "Gmail",
+                        auth: {
+                            user: "itplcc40@gmail.com",
+                            pass: "DevelP7@"
+                        }
+                    });
+
+                    var mail = {
+                        from: req.body.fullname+" <"+req.body.email+">",
+                        to: "debasiskar007@gmail.com,debasis218@gmail.com",
+                        subject: "New Contact Form Submission by "+req.body.fullname+" on allanschuman.com",
+                        //text: "Node.js New world for me",
+                        html: "<b>Name</b> :   "+req.body.fullname +"<br><b>Email</b> :   "+req.body.email+ "<br><b>Phone Number</b> :   "+req.body.phone +"<br><b>Address</b> :   "+req.body.address+"<br><b>Interest</b> :   "+req.body.interest+"<br><b>Message</b> :   "+req.body.comments
+                    }
+
+                    smtpTransport.sendMail(mail, function(error, response){
+                        if(error){
+                          //  console.log(error);
+                        }else{
+                          //  console.log("Message sent: " + response.message);
+                        }
+
+                        resp.send((response.message));
+                        smtpTransport.close();
+                    });
+
+                   // console.log('success full query');
+                    //resp.send('Hello'+rows[0].fname);
                     //db.close();
                     /*resp.send((req));*/
                 }
@@ -390,18 +511,114 @@ app.post('/rolelist', function (req, resp) {
 
     MongoClient.connect(url, function (err, db) {
         if (err) {
-            console.log('Unable to connect to the mongoDB server. Error:', err);
+          //  console.log('Unable to connect to the mongoDB server. Error:', err);
         } else {
             //HURRAY!! We are connected. :)
-            console.log('Connection established to mongo db', url);
+         //   console.log('Connection established to mongo db', url);
 
             var collection = db.collection('user_role');
 
             collection.find().toArray(function(err, items) {
 
-                console.log(items);
-                console.log('-----------------------------------');
-                console.log(items.length);
+             //   console.log(items);
+             //   console.log('-----------------------------------');
+              //  console.log(items.length);
+                resp.send(JSON.stringify(items));
+                ///dbresults.push(items);
+            });
+
+
+            //db.close();
+        }
+    });
+
+
+
+
+});
+app.post('/contactlist', function (req, resp) {
+
+    MongoClient.connect(url, function (err, db) {
+        if (err) {
+           // console.log('Unable to connect to the mongoDB server. Error:', err);
+        } else {
+            //HURRAY!! We are connected. :)
+          //  console.log('Connection established to mongo db', url);
+
+            var collection = db.collection('contacttable');
+
+            collection.find().toArray(function(err, items) {
+
+           //     console.log(items);
+           //     console.log('-----------------------------------');
+           //     console.log(items.length);
+                resp.send(JSON.stringify(items));
+                ///dbresults.push(items);
+            });
+
+
+            //db.close();
+        }
+    });
+
+
+
+
+});
+
+app.post('/articlelist', function (req, resp) {
+
+    MongoClient.connect(url, function (err, db) {
+        if (err) {
+        //    console.log('Unable to connect to the mongoDB server. Error:', err);
+        } else {
+            //HURRAY!! We are connected. :)
+         //   console.log('Connection established to mongo db', url);
+
+            var collection = db.collection('article');
+
+            collection.find().toArray(function(err, items) {
+
+             //   console.log(items);
+             //   console.log('-----------------------------------');
+             //   console.log(items.length);
+                resp.send(JSON.stringify(items));
+                ///dbresults.push(items);
+            });
+
+
+            //db.close();
+        }
+    });
+
+
+
+
+});
+
+app.post('/login', function (req, resp) {
+
+    MongoClient.connect(url, function (err, db) {
+        if (err) {
+         //   console.log('Unable to connect to the mongoDB server. Error:', err);
+        } else {
+            //HURRAY!! We are connected. :)
+          //  console.log('Connection established to mongo db', url);
+
+            var collection = db.collection('userstable');
+
+            var crypto = require('crypto');
+
+            var secret = req.body.password;
+            var hash = crypto.createHmac('sha256', secret)
+                .update('password')
+                .digest('hex');
+
+            collection.find({email:req.body.email,password:hash}).toArray(function(err, items) {
+
+            //    console.log(items);
+            //    console.log('-----------------------------------');
+            //    console.log(items.length);
                 resp.send(JSON.stringify(items));
                 ///dbresults.push(items);
             });
@@ -420,18 +637,18 @@ app.get('/adminlist', function (req, resp) {
 
     MongoClient.connect(url, function (err, db) {
         if (err) {
-            console.log('Unable to connect to the mongoDB server. Error:', err);
+         //   console.log('Unable to connect to the mongoDB server. Error:', err);
         } else {
             //HURRAY!! We are connected. :)
-            console.log('Connection established to mongo db', url);
+          //  console.log('Connection established to mongo db', url);
 
             var collection = db.collection('userstable');
 
             collection.find().toArray(function(err, items) {
 
-                console.log(items);
-                console.log('-----------------------------------');
-                console.log(items.length);
+             //   console.log(items);
+             //   console.log('-----------------------------------');
+             //   console.log(items.length);
                 resp.send(JSON.stringify(items));
                 ///dbresults.push(items);
             });
@@ -451,18 +668,48 @@ app.get('/medialist', function (req, resp) {
 
     MongoClient.connect(url, function (err, db) {
         if (err) {
-            console.log('Unable to connect to the mongoDB server. Error:', err);
+         //   console.log('Unable to connect to the mongoDB server. Error:', err);
         } else {
             //HURRAY!! We are connected. :)
-            console.log('Connection established to mongo db', url);
+         //   console.log('Connection established to mongo db', url);
 
             var collection = db.collection('media_youtube');
 
             collection.find().toArray(function(err, items) {
 
-                console.log(items);
-                console.log('-----------------------------------');
-                console.log(items.length);
+         //       console.log(items);
+         //       console.log('-----------------------------------');
+         //       console.log(items.length);
+                resp.send(JSON.stringify(items));
+                ///dbresults.push(items);
+            });
+
+
+            //db.close();
+        }
+    });
+
+
+
+
+});
+
+app.get('/stafflist', function (req, resp) {
+
+    MongoClient.connect(url, function (err, db) {
+        if (err) {
+         //   console.log('Unable to connect to the mongoDB server. Error:', err);
+        } else {
+            //HURRAY!! We are connected. :)
+         //   console.log('Connection established to mongo db', url);
+
+            var collection = db.collection('staff');
+
+            collection.find().toArray(function(err, items) {
+
+          //      console.log(items);
+          //      console.log('-----------------------------------');
+          //      console.log(items.length);
                 resp.send(JSON.stringify(items));
                 ///dbresults.push(items);
             });
@@ -483,16 +730,16 @@ app.post('/addrole', function (req, resp) {
     var role_status=1;
 
     value1 = {role: req.body.role, addtime: addtime, role_status: role_status};
-    console.log("Insert command");
+ //   console.log("Insert command");
 
 
 
     MongoClient.connect(url, function (err, db) {
         if (err) {
-            console.log('Unable to connect to the mongoDB server. Error:', err);
+    //       console.log('Unable to connect to the mongoDB server. Error:', err);
         } else {
             //HURRAY!! We are connected. :)
-            console.log('Connection established to mongo db', url);
+    //        console.log('Connection established to mongo db', url);
 
 
             var collection = db.collection('user_role');
@@ -500,10 +747,10 @@ app.post('/addrole', function (req, resp) {
 
             collection.insert([value1], function (err, result) {
                 if (err) {
-                    console.log(err);
-                    console.log('err-----mingo .. vag ');
+        //            console.log(err);
+        //            console.log('err-----mingo .. vag ');
                 } else {
-                    console.log('Inserted %d documents into the "users" collection. The documents inserted with "_id" are:', result.length, result);
+         //           console.log('Inserted %d documents into the "users" collection. The documents inserted with "_id" are:', result.length, result);
                     resp.send('Inserted %d documents into the "users" collection. The documents inserted with "_id" are:', result.length, result);
 
 
@@ -522,16 +769,23 @@ app.post('/addadmin', function (req, resp) {
     var addtime=Date.now();
     var role_status=1;
 
-    value1 = {fname: req.body.fname, lname: req.body.lname, email: req.body.email,password:req.body.password,address:req.body.address,phone_no:req.body.phone_no,mobile_no:req.body.mobile_no,status:1,create_time:req.addtime};
-    console.log("Insert command");
+    var crypto = require('crypto');
+
+    var secret = req.body.password;
+    var hash = crypto.createHmac('sha256', secret)
+        .update('password')
+        .digest('hex');
+
+    value1 = {fname: req.body.fname, lname: req.body.lname, email: req.body.email,password:hash,address:req.body.address,phone_no:req.body.phone_no,mobile_no:req.body.mobile_no,status:1,create_time:req.addtime};
+   // console.log("Insert command");
 
 
     MongoClient.connect(url, function (err, db) {
         if (err) {
-            console.log('Unable to connect to the mongoDB server. Error:', err);
+      //      console.log('Unable to connect to the mongoDB server. Error:', err);
         } else {
             //HURRAY!! We are connected. :)
-            console.log('Connection established to mongo db', url);
+       //     console.log('Connection established to mongo db', url);
 
 
             var collection = db.collection('userstable');
@@ -539,10 +793,87 @@ app.post('/addadmin', function (req, resp) {
 
             collection.insert([value1], function (err, result) {
                 if (err) {
-                    console.log(err);
-                    console.log('err-----mingo .. vag ');
+             //       console.log(err);
+             //       console.log('err-----mingo .. vag ');
                 } else {
-                    console.log('Inserted %d documents into the "users" collection. The documents inserted with "_id" are:', result.length, result);
+              //      console.log('Inserted %d documents into the "users" collection. The documents inserted with "_id" are:', result.length, result);
+                    resp.send('Inserted %d documents into the "users" collection. The documents inserted with "_id" are:', result.length, result);
+
+
+                }
+            });
+
+
+        }
+    });
+
+
+});
+
+app.post('/addstaff', function (req, resp) {
+
+    var addtime=Date.now();
+    var role_status=1;
+
+    value1 = {title: req.body.title, designation: req.body.designation, email: req.body.email,phone:req.body.phone,description:req.body.description,picture:req.body.picture,type:req.body.type,status:1,create_time:req.addtime,featured:req.body.featured,priority:req.body.priority};
+  //  console.log("Insert command");
+
+
+    MongoClient.connect(url, function (err, db) {
+        if (err) {
+       //     console.log('Unable to connect to the mongoDB server. Error:', err);
+        } else {
+            //HURRAY!! We are connected. :)
+      //      console.log('Connection established to mongo db', url);
+
+
+            var collection = db.collection('staff');
+
+
+            collection.insert([value1], function (err, result) {
+                if (err) {
+         //           console.log(err);
+          //          console.log('err-----mingo .. vag ');
+                } else {
+           //         console.log('Inserted %d documents into the "users" collection. The documents inserted with "_id" are:', result.length, result);
+                    resp.send('Inserted %d documents into the "users" collection. The documents inserted with "_id" are:', result.length, result);
+
+
+                }
+            });
+
+
+        }
+    });
+
+
+});
+
+app.post('/addarticle', function (req, resp) {
+
+    var addtime=Date.now();
+    var role_status=1;
+
+    value1 = {title: req.body.title,description: req.body.description, createdby: req.body.createdby,createdtime:addtime,image: req.body.image,status: 1,video: req.body.video };
+
+
+    MongoClient.connect(url, function (err, db) {
+        if (err) {
+         //   console.log('Unable to connect to the mongoDB server. Error:', err);
+        } else {
+            //HURRAY!! We are connected. :)
+         //   console.log('Connection established to mongo db', url);
+
+
+            var collection = db.collection('article');
+
+
+            collection.insert([value1], function (err, result) {
+                if (err) {
+               //     console.log(err);
+                //    console.log('err-----mingo .. vag ');
+                } else {
+                //    console.log('Inserted %d documents into the "users" collection. The documents inserted with "_id" are:', result.length, result);
                     resp.send('Inserted %d documents into the "users" collection. The documents inserted with "_id" are:', result.length, result);
 
 
@@ -563,15 +894,15 @@ app.post('/addmedia', function (req, resp) {
     var role_status=1;
 
     value1 = {media_name: req.body.media_name,media_file: req.body.media_file, priority: req.body.priority,status: 1,priority: req.body.priority,status: 1,add_time: addtime };
-    console.log("Insert command");
+  //  console.log("Insert command");
 
 
     MongoClient.connect(url, function (err, db) {
         if (err) {
-            console.log('Unable to connect to the mongoDB server. Error:', err);
+      //      console.log('Unable to connect to the mongoDB server. Error:', err);
         } else {
             //HURRAY!! We are connected. :)
-            console.log('Connection established to mongo db', url);
+       //     console.log('Connection established to mongo db', url);
 
 
             var collection = db.collection('media_youtube');
@@ -579,10 +910,10 @@ app.post('/addmedia', function (req, resp) {
 
             collection.insert([value1], function (err, result) {
                 if (err) {
-                    console.log(err);
-                    console.log('err-----mingo .. vag ');
+        //            console.log(err);
+        //            console.log('err-----mingo .. vag ');
                 } else {
-                    console.log('Inserted %d documents into the "users" collection. The documents inserted with "_id" are:', result.length, result);
+          ///          console.log('Inserted %d documents into the "users" collection. The documents inserted with "_id" are:', result.length, result);
                     resp.send('Inserted %d documents into the "users" collection. The documents inserted with "_id" are:', result.length, result);
 
 
@@ -602,11 +933,11 @@ app.post('/addmedia', function (req, resp) {
 app.get('/roledetails/:id', function (req, resp) {
    MongoClient.connect(url, function (err, db) {
         if (err) {
-            console.log('Unable to connect to the mongoDB server. Error:', err);
+        //    console.log('Unable to connect to the mongoDB server. Error:', err);
         } else {
             //HURRAY!! We are connected. :)
 
-            console.log('Connection established to mongo db', url);
+          //  console.log('Connection established to mongo db', url);
 
 
             var o_id = new mongodb.ObjectID(req.params.id);
@@ -615,9 +946,9 @@ app.get('/roledetails/:id', function (req, resp) {
 
             collection.find({_id:o_id}).toArray(function(err, items) {
 
-                console.log(items);
-                console.log('-----------------------------------');
-                console.log(items.length);
+            //    console.log(items);
+          //      console.log('-----------------------------------');
+          //      console.log(items.length);
                 resp.send(JSON.stringify(items));
 
             });
@@ -630,11 +961,11 @@ app.get('/roledetails/:id', function (req, resp) {
 app.post('/admindetails', function (req, resp) {
    MongoClient.connect(url, function (err, db) {
         if (err) {
-            console.log('Unable to connect to the mongoDB server. Error:', err);
+     //       console.log('Unable to connect to the mongoDB server. Error:', err);
         } else {
             //HURRAY!! We are connected. :)
 
-            console.log('Connection established to mongo db', url);
+      //      console.log('Connection established to mongo db', url);
 
 
             var o_id = new mongodb.ObjectID(req.body.id);
@@ -643,9 +974,65 @@ app.post('/admindetails', function (req, resp) {
 
             collection.find({_id:o_id}).toArray(function(err, items) {
 
-                console.log(items);
-                console.log('-----------------------------------');
+            //    console.log(items);
+            //    console.log('-----------------------------------');
+            //    console.log(items.length);
+                resp.send(JSON.stringify(items));
+
+            });
+
+        }
+    });
+
+});
+
+
+app.post('/articledetails', function (req, resp) {
+   MongoClient.connect(url, function (err, db) {
+        if (err) {
+        //    console.log('Unable to connect to the mongoDB server. Error:', err);
+        } else {
+            //HURRAY!! We are connected. :)
+
+         //   console.log('Connection established to mongo db', url);
+
+
+            var o_id = new mongodb.ObjectID(req.body.id);
+
+            var collection = db.collection('article');
+
+            collection.find({_id:o_id}).toArray(function(err, items) {
+
                 console.log(items.length);
+                resp.send(JSON.stringify(items));
+                db.close();
+
+            });
+
+        }
+    });
+
+});
+
+app.post('/staffdetails', function (req, resp) {
+   MongoClient.connect(url, function (err, db) {
+        if (err) {
+         //   console.log('Unable to connect to the mongoDB server. Error:', err);
+        } else {
+            //HURRAY!! We are connected. :)
+
+         //   console.log('Connection established to mongo db', url);
+
+
+            var o_id = new mongodb.ObjectID(req.body.id);
+
+            var collection = db.collection('staff');
+
+            collection.find({_id:o_id}).toArray(function(err, items) {
+
+           //     console.log(items);
+           //     console.log('-----------------------------------');
+            //    console.log(items.length);
                 resp.send(JSON.stringify(items));
 
             });
@@ -659,11 +1046,11 @@ app.post('/admindetails', function (req, resp) {
 app.post('/mediadetails', function (req, resp) {
    MongoClient.connect(url, function (err, db) {
         if (err) {
-            console.log('Unable to connect to the mongoDB server. Error:', err);
+         //   console.log('Unable to connect to the mongoDB server. Error:', err);
         } else {
             //HURRAY!! We are connected. :)
 
-            console.log('Connection established to mongo db', url);
+           // console.log('Connection established to mongo db', url);
 
 
             var o_id = new mongodb.ObjectID(req.body.id);
@@ -672,9 +1059,9 @@ app.post('/mediadetails', function (req, resp) {
 
             collection.find({_id:o_id}).toArray(function(err, items) {
 
-                console.log(items);
-                console.log('-----------------------------------');
-                console.log(items.length);
+            //    console.log(items);
+            //    console.log('-----------------------------------');
+            //    console.log(items.length);
                 resp.send(JSON.stringify(items));
 
             });
@@ -689,11 +1076,11 @@ app.post('/mediadetails', function (req, resp) {
 app.post('/deleterole', function (req, resp) {
    MongoClient.connect(url, function (err, db) {
         if (err) {
-            console.log('Unable to connect to the mongoDB server. Error:', err);
+        //    console.log('Unable to connect to the mongoDB server. Error:', err);
         } else {
             //HURRAY!! We are connected. :)
 
-            console.log('Connection established to mongo db', url);
+        //    console.log('Connection established to mongo db', url);
 
 
             var o_id = new mongodb.ObjectID(req.body.id);
@@ -713,15 +1100,69 @@ app.post('/deleterole', function (req, resp) {
 
 });
 
+app.post('/deletestaff', function (req, resp) {
+   MongoClient.connect(url, function (err, db) {
+        if (err) {
+        //    console.log('Unable to connect to the mongoDB server. Error:', err);
+        } else {
+            //HURRAY!! We are connected. :)
+
+        //    console.log('Connection established to mongo db', url);
+
+
+            var o_id = new mongodb.ObjectID(req.body.id);
+
+            var collection = db.collection('staff');
+            collection.deleteOne({_id: o_id}, function(err, results) {
+                if (err){
+                    resp.send("failed");
+                    throw err;
+                }
+                else resp.send("success");
+            });
+
+
+        }
+    });
+
+});
+
+
+app.post('/deletearticle', function (req, resp) {
+   MongoClient.connect(url, function (err, db) {
+        if (err) {
+          //  console.log('Unable to connect to the mongoDB server. Error:', err);
+        } else {
+            //HURRAY!! We are connected. :)
+
+          //  console.log('Connection established to mongo db', url);
+
+            var o_id = new mongodb.ObjectID(req.body.id);
+
+            var collection = db.collection('article');
+            collection.deleteOne({_id: o_id}, function(err, results) {
+                if (err){
+                    resp.send("failed");
+                    throw err;
+                }
+                else resp.send("success");
+            });
+
+
+        }
+    });
+
+});
+
 
 app.post('/deletemedia', function (req, resp) {
    MongoClient.connect(url, function (err, db) {
         if (err) {
-            console.log('Unable to connect to the mongoDB server. Error:', err);
+        //    console.log('Unable to connect to the mongoDB server. Error:', err);
         } else {
             //HURRAY!! We are connected. :)
 
-            console.log('Connection established to mongo db', url);
+        //    console.log('Connection established to mongo db', url);
 
 
             var o_id = new mongodb.ObjectID(req.body.id);
@@ -746,11 +1187,11 @@ app.post('/deletemedia', function (req, resp) {
 app.post('/deleteadmin', function (req, resp) {
    MongoClient.connect(url, function (err, db) {
         if (err) {
-            console.log('Unable to connect to the mongoDB server. Error:', err);
+        //    console.log('Unable to connect to the mongoDB server. Error:', err);
         } else {
             //HURRAY!! We are connected. :)
 
-            console.log('Connection established to mongo db', url);
+         //   console.log('Connection established to mongo db', url);
 
 
             var o_id = new mongodb.ObjectID(req.body.id);
@@ -773,11 +1214,11 @@ app.post('/deleteadmin', function (req, resp) {
 app.post('/roleupdates', function (req, resp) {
    MongoClient.connect(url, function (err, db) {
         if (err) {
-            console.log('Unable to connect to the mongoDB server. Error:', err);
+       //     console.log('Unable to connect to the mongoDB server. Error:', err);
         } else {
             //HURRAY!! We are connected. :)
 
-            console.log('Connection established to mongo db', url);
+        //    console.log('Connection established to mongo db', url);
 
 
             var o_id = new mongodb.ObjectID(req.body.id);
@@ -800,11 +1241,11 @@ app.post('/roleupdates', function (req, resp) {
 app.post('/adminupdates', function (req, resp) {
    MongoClient.connect(url, function (err, db) {
         if (err) {
-            console.log('Unable to connect to the mongoDB server. Error:', err);
+        //    console.log('Unable to connect to the mongoDB server. Error:', err);
         } else {
             //HURRAY!! We are connected. :)
 
-            console.log('Connection established to mongo db', url);
+         //   console.log('Connection established to mongo db', url);
 
 
             var o_id = new mongodb.ObjectID(req.body.id);
@@ -823,22 +1264,74 @@ app.post('/adminupdates', function (req, resp) {
     });
 
 });
+app.post('/staffupdates', function (req, resp) {
+   MongoClient.connect(url, function (err, db) {
+        if (err) {
+       //     console.log('Unable to connect to the mongoDB server. Error:', err);
+        } else {
+            //HURRAY!! We are connected. :)
+
+        //    console.log('Connection established to mongo db', url);
+
+
+            var o_id = new mongodb.ObjectID(req.body.id);
+
+            var collection = db.collection('staff');
+            collection.update({_id: o_id}, {$set: {description: req.body.description,designation: req.body.designation,email: req.body.email,phone:req.body.phone,picture:req.body.picture,status:req.body.status,title:req.body.title,type:req.body.type,featured:req.body.featured,priority:req.body.priority }},function(err, results) {
+                if (err){
+                    resp.send("failed");
+                    throw err;
+                }
+                else resp.send("success");
+            });
+
+
+        }
+    });
+
+});
 
 
 app.post('/mediaupdates', function (req, resp) {
    MongoClient.connect(url, function (err, db) {
         if (err) {
-            console.log('Unable to connect to the mongoDB server. Error:', err);
+       //     console.log('Unable to connect to the mongoDB server. Error:', err);
         } else {
             //HURRAY!! We are connected. :)
 
-            console.log('Connection established to mongo db', url);
+       //     console.log('Connection established to mongo db', url);
 
 
             var o_id = new mongodb.ObjectID(req.body.id);
 
             var collection = db.collection('media_youtube');
-            collection.update({_id: o_id}, {$set: {media_name: req.body.media_name,media_file: req.body.media_file,priority: req.body.priority, }},function(err, results) {
+            collection.update({_id: o_id}, {$set: {media_name: req.body.media_name,media_file: req.body.media_file,priority: req.body.priority }},function(err, results) {
+                if (err){
+                    resp.send("failed");
+                    throw err;
+                }
+                else resp.send("success");
+            });
+
+
+        }
+    });
+
+});
+app.post('/articleupdates', function (req, resp) {
+   MongoClient.connect(url, function (err, db) {
+        if (err) {
+        //    console.log('Unable to connect to the mongoDB server. Error:', err);
+        } else {
+            //HURRAY!! We are connected. :)
+
+       //     console.log('Connection established to mongo db', url);
+
+
+            var o_id = new mongodb.ObjectID(req.body.id);
+
+            var collection = db.collection('article');
+            collection.update({_id: o_id}, {$set: {title: req.body.title,description: req.body.description,image: req.body.image,status:req.body.status,createdby:req.body.createdby,video:req.body.video }},function(err, results) {
                 if (err){
                     resp.send("failed");
                     throw err;
@@ -858,11 +1351,11 @@ app.post('/mediaupdates', function (req, resp) {
 app.post('/adminupdatestatus', function (req, resp) {
    MongoClient.connect(url, function (err, db) {
         if (err) {
-            console.log('Unable to connect to the mongoDB server. Error:', err);
+     //       console.log('Unable to connect to the mongoDB server. Error:', err);
         } else {
             //HURRAY!! We are connected. :)
 
-            console.log('Connection established to mongo db', url);
+     //       console.log('Connection established to mongo db', url);
 
 
             var o_id = new mongodb.ObjectID(req.body.id);
@@ -882,15 +1375,68 @@ app.post('/adminupdatestatus', function (req, resp) {
 
 });
 
+app.post('/articleupdatestatus', function (req, resp) {
+   MongoClient.connect(url, function (err, db) {
+        if (err) {
+       //     console.log('Unable to connect to the mongoDB server. Error:', err);
+        } else {
+            //HURRAY!! We are connected. :)
+
+      //      console.log('Connection established to mongo db', url);
+
+
+            var o_id = new mongodb.ObjectID(req.body.id);
+
+            var collection = db.collection('article');
+            collection.update({_id: o_id}, {$set: {status: req.body.status}},function(err, results) {
+                if (err){
+                    resp.send("failed");
+                    throw err;
+                }
+                else resp.send("success");
+            });
+
+
+        }
+    });
+
+});
+app.post('/staffupdatestatus', function (req, resp) {
+   MongoClient.connect(url, function (err, db) {
+        if (err) {
+     //       console.log('Unable to connect to the mongoDB server. Error:', err);
+        } else {
+            //HURRAY!! We are connected. :)
+
+      //      console.log('Connection established to mongo db', url);
+
+
+            var o_id = new mongodb.ObjectID(req.body.id);
+
+            var collection = db.collection('staff');
+            collection.update({_id: o_id}, {$set: {status: req.body.status}},function(err, results) {
+                if (err){
+                    resp.send("failed");
+                    throw err;
+                }
+                else resp.send("success");
+            });
+
+
+        }
+    });
+
+});
+
 
 app.post('/mediaupdatestatus', function (req, resp) {
    MongoClient.connect(url, function (err, db) {
         if (err) {
-            console.log('Unable to connect to the mongoDB server. Error:', err);
+      //      console.log('Unable to connect to the mongoDB server. Error:', err);
         } else {
             //HURRAY!! We are connected. :)
 
-            console.log('Connection established to mongo db', url);
+       //     console.log('Connection established to mongo db', url);
 
 
             var o_id = new mongodb.ObjectID(req.body.id);
@@ -911,12 +1457,189 @@ app.post('/mediaupdatestatus', function (req, resp) {
 });
 
 
+/****************Banner Module[start]**************/
+
+app.post('/bannerlist', function (req, resp) {
+
+    MongoClient.connect(url, function (err, db) {
+        if (err) {
+          //  console.log('Unable to connect to the mongoDB server. Error:', err);
+        } else {
+            //HURRAY!! We are connected. :)
+          //  console.log('Connection established to mongo db', url);
+
+            var collection = db.collection('banner_db');
+
+            collection.find().toArray(function(err, items) {
+
+               resp.send(JSON.stringify(items));
+                db.close();
+            });
+
+
+            //db.close();
+        }
+    });
+
+
+
+
+});
+
+app.post('/bannerdetails', function (req, resp) {
+    MongoClient.connect(url, function (err, db) {
+        if (err) {
+            //   console.log('Unable to connect to the mongoDB server. Error:', err);
+        } else {
+            //HURRAY!! We are connected. :)
+
+            //   console.log('Connection established to mongo db', url);
+
+
+            var o_id = new mongodb.ObjectID(req.body.id);
+
+            var collection = db.collection('banner_db');
+
+            collection.find({_id:o_id}).toArray(function(err, items) {
+
+                //     console.log(items);
+                //     console.log('-----------------------------------');
+                //    console.log(items.length);
+                resp.send(JSON.stringify(items));
+                db.close();
+
+            });
+
+        }
+    });
+
+});
+
+
+app.post('/addbanner', function (req, resp) {
+
+    value1 = {bannerfile: req.body.file, priority: req.body.priority,status: 1};
+
+    MongoClient.connect(url, function (err, db) {
+        if (err) {
+         ///   console.log('Unable to connect to the mongoDB server. Error:', err);
+        } else {
+            //HURRAY!! We are connected. :)
+          //  console.log('Connection established to mongo db', url);
+
+
+            var collection = db.collection('banner_db');
+
+
+            collection.insert([value1], function (err, result) {
+                if (err) {
+                    resp.send(err);
+                } else {
+                    resp.send('Inserted %d documents into the "users" collection. The documents inserted with "_id" are:', result.length, result);
+                    db.close();
+                }
+            });
+
+
+        }
+    });
+
+
+});
+
+app.post('/bannerupdates', function (req, resp) {
+    MongoClient.connect(url, function (err, db) {
+        if (err) {
+            //     console.log('Unable to connect to the mongoDB server. Error:', err);
+        } else {
+            //HURRAY!! We are connected. :)
+
+            //    console.log('Connection established to mongo db', url);
+
+
+            var o_id = new mongodb.ObjectID(req.body.id);
+
+            var collection = db.collection('banner_db');
+            collection.update({_id: o_id}, {$set: {status:req.body.status,bannerfile: req.body.file, priority: req.body.priority }},function(err, results) {
+                if (err){
+                    resp.send("failed");
+                    throw err;
+                }
+                else resp.send("success");
+            });
+
+
+        }
+    });
+
+});
+
+
+app.post('/bannerupdatestatus', function (req, resp) {
+    MongoClient.connect(url, function (err, db) {
+        if (err) {
+            //       console.log('Unable to connect to the mongoDB server. Error:', err);
+        } else {
+            //HURRAY!! We are connected. :)
+
+            //      console.log('Connection established to mongo db', url);
+
+
+            var o_id = new mongodb.ObjectID(req.body.id);
+
+            var collection = db.collection('banner_db');
+            collection.update({_id: o_id}, {$set: {status: req.body.status}},function(err, results) {
+                if (err){
+                    resp.send("failed");
+                    throw err;
+                }
+                else resp.send("success");
+            });
+
+
+        }
+    });
+
+});
+
+app.post('/deletebanner', function (req, resp) {
+    MongoClient.connect(url, function (err, db) {
+        if (err) {
+            //    console.log('Unable to connect to the mongoDB server. Error:', err);
+        } else {
+            //HURRAY!! We are connected. :)
+
+            //    console.log('Connection established to mongo db', url);
+
+
+            var o_id = new mongodb.ObjectID(req.body.id);
+
+            var collection = db.collection('banner_db');
+            collection.deleteOne({_id: o_id}, function(err, results) {
+                if (err){
+                    resp.send("failed");
+                    throw err;
+                }
+                else resp.send("success");
+            });
+
+
+        }
+    });
+
+});
+
+
+/****************Banner Module[end]**************/
+
+
+
 app.post('/upload',function(req, res){
 
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Headers", "X-Requested-With");
-    console.log(req.body.Filedata);
-    console.log(JSON.stringify(req));
+   // console.log(req.body.Filedata);
+ //   console.log(JSON.stringify(req));
 
 
 
@@ -944,7 +1667,7 @@ var server = app.listen(port, function () {
     var host = server.address().address
     var port = server.address().port
 
-    console.log("Example app listening at http://%s:%s", host, port)
+  //  console.log("Example app listening at http://%s:%s", host, port)
 
 })
 

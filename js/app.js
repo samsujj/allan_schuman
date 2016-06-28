@@ -10,7 +10,7 @@ function canJSON(value) {
     }
 }
 /* App Module */
-var r1headzappvar = angular.module('r1headzapp', ['app2','user_module_app','admin_module_app','media_module_app','ui.router','angularValidator','ngCookies','ui.bootstrap','ngFileUpload','ui.tinymce','youtube-embed']);
+var r1headzappvar = angular.module('r1headzapp', ['app2','common_module_app','user_module_app','admin_module_app','media_module_app','media_article_module_app','stuff_module_app','admin_common_module_app','banner_module_app','ui.router','angularValidator','ngCookies','ui.bootstrap','ngFileUpload','ui.tinymce','youtube-embed','angularLazyImg']);
 
 r1headzappvar.run(['$rootScope', '$state','contentservice','$uibModal','$log',function($rootScope, $state,contentservice,$uibModal,$log){
 
@@ -42,8 +42,8 @@ r1headzappvar.run(['$rootScope', '$state','contentservice','$uibModal','$log',fu
                     //console.log(value.type);
                     $rootScope.tempval = value;
                     if (value.ctype == "html" || value.ctype == 'text') {
-                        console.log(value.content);
-                        console.log(typeof (value.content));
+                       // console.log(value.content);
+                       // console.log(typeof (value.content));
                         if(canJSON(value.content)) {
                             $rootScope.tempval.content = JSON.parse(value.content);
 
@@ -85,7 +85,7 @@ r1headzappvar.run(['$rootScope', '$state','contentservice','$uibModal','$log',fu
                 day  = ("0" + date.getDate()),
                 hour  = ("0" + date.getHours()),
                 minute  = ("0" + date.getMinutes());
-            console.log(date);
+          //  console.log(date);
             return [ date.getFullYear(), mnth, day,hour,minute ].join("-");
             //return new Date(date).getTime() / 1000
         }
@@ -115,7 +115,7 @@ r1headzappvar.run(['$rootScope', '$state','contentservice','$uibModal','$log',fu
 
     $rootScope.opencontentmodal = function (size,id) {
 
-        console.log('in openmodal');
+      //  console.log('in openmodal');
 
       // if($rootScope.userid!=0) {
            console.log('in openmodal');
@@ -159,6 +159,31 @@ r1headzappvar.filter('startFrom', function () {
         return [];
     };
 });
+
+r1headzappvar.filter('limitHtml', ['$sce',function($sce) {
+    return function(text, limit) {
+
+        var changedString = String(text).replace(/<[^>]+>/gm, '');
+        var length = changedString.length;
+        var newStr = '';
+
+        newStr =  length > limit ? changedString.substr(0, limit - 1)+"..." : changedString;
+
+        return $sce.trustAsHtml(newStr);
+    }
+}]);
+
+r1headzappvar.filter('limitText', ['$sce',function($sce) {
+    return function(text, limit) {
+
+        var length = text.length;
+        var newStr = '';
+
+        newStr =  length > limit ? text.substr(0, limit - 1)+"..." : text;
+
+        return $sce.trustAsHtml(newStr);
+    }
+}]);
 
 r1headzappvar.directive('content',['$compile','$sce','$state','$rootScope', function($compile,$sce,$state,$rootScope) {
     var directive = {};
@@ -238,8 +263,8 @@ r1headzappvar.config(function($stateProvider, $urlRouterProvider,$locationProvid
                 },
                 'modalview': {
                     templateUrl: 'partial/modalview.html' ,
-                    controller: 'home'
-                },
+                    //controller: 'home'
+                }
             }
         }
     )
@@ -262,7 +287,7 @@ r1headzappvar.config(function($stateProvider, $urlRouterProvider,$locationProvid
                     'modalview': {
                         templateUrl: 'partial/modalview.html' ,
                         controller: 'test'
-                    },
+                    }
                 }
             }
         )
@@ -286,7 +311,7 @@ r1headzappvar.config(function($stateProvider, $urlRouterProvider,$locationProvid
                 'modalview': {
                     templateUrl: 'partial/modalview.html' ,
                     controller: 'home'
-                },
+                }
             }
         }
     )
@@ -310,7 +335,7 @@ r1headzappvar.config(function($stateProvider, $urlRouterProvider,$locationProvid
                 'modalview': {
                     templateUrl: 'partial/modalview.html' ,
                     controller: 'home'
-                },
+                }
             }
         }
     )
@@ -356,19 +381,19 @@ r1headzappvar.config(function($stateProvider, $urlRouterProvider,$locationProvid
                     },
                     'modalview': {
                         templateUrl: 'partial/modalview.html' ,
-                        controller: 'staff'
+                        //controller: 'staff'
                     },
                 }
             }
         )
 
         .state('staffdetails',{
-            url:"/staffdetails",
+            url:"/staff-details/:id/:name",
             views: {
 
                 'content': {
                     templateUrl: 'partial/staff_details.html' ,
-                    controller: 'staff'
+                    controller: 'staffdetails'
                 },
                 'header': {
                     templateUrl: 'partial/header.html' ,
@@ -380,7 +405,7 @@ r1headzappvar.config(function($stateProvider, $urlRouterProvider,$locationProvid
                 },
                 'modalview': {
                     templateUrl: 'partial/modalview.html' ,
-                    controller: 'staff'
+                    //controller: 'staffdetails'
                 },
             }
         }
@@ -404,13 +429,37 @@ r1headzappvar.config(function($stateProvider, $urlRouterProvider,$locationProvid
                     },
                     'modalview': {
                         templateUrl: 'partial/modalview.html' ,
-                        controller: 'mediaarticles'
+                        //controller: 'mediaarticles'
+                    },
+                }
+            }
+        )
+
+        .state('articles-details',{
+                url:"/articles-details/:id",
+                views: {
+
+                    'content': {
+                        templateUrl: 'partial/media_articles_details.html' ,
+                        controller: 'mediaarticlesdetails'
+                    },
+                    'header': {
+                        templateUrl: 'partial/header.html' ,
+                        controller: 'header'
+                    },
+                    'footer': {
+                        templateUrl: 'partial/footer.html' ,
+                        controller: 'header'
+                    },
+                    'modalview': {
+                        templateUrl: 'partial/modalview.html' ,
+                        //controller: 'mediaarticles'
                     },
                 }
             }
         )
         .state('media-video',{
-                url:"/media-video",
+                url:"/media-videos",
                 views: {
 
                     'content': {
@@ -427,7 +476,7 @@ r1headzappvar.config(function($stateProvider, $urlRouterProvider,$locationProvid
                     },
                     'modalview': {
                         templateUrl: 'partial/modalview.html' ,
-                        controller: 'mediavideo'
+                        //controller: 'mediavideo'
                     },
                 }
             }
@@ -474,7 +523,7 @@ r1headzappvar.config(function($stateProvider, $urlRouterProvider,$locationProvid
                     },
                     'modalview': {
                         templateUrl: 'partial/modalview.html' ,
-                        controller: 'contact'
+                       // controller: 'contact'
                     },
                 }
             }
@@ -484,8 +533,8 @@ r1headzappvar.config(function($stateProvider, $urlRouterProvider,$locationProvid
             views: {
 
                 'content': {
-                    templateUrl: 'partial/t1.html' ,
-                    controller: 'home1'
+                    templateUrl: 'partial/home_new.html' ,
+                    controller: 'homenew'
                 },
                 'header': {
                     templateUrl: 'partial/header.html' ,
@@ -502,29 +551,63 @@ r1headzappvar.config(function($stateProvider, $urlRouterProvider,$locationProvid
             }
         }
     )
-        .state('add-admin',{
-                url:"/add-admin",
-                views: {
+        .state('logout',{
+            url:"/logout",
+            views: {
+                'content': {
+                    controller: 'logout'
+                },
 
-                    'admin_header': {
-                        templateUrl: 'partial/admin_top_menu.html' ,
-                        controller: 'admin_header'
-                    },
-                    'admin_left': {
-                        templateUrl: 'partial/admin_left.html' ,
-                        //  controller: 'admin_left'
-                    },
-                    'admin_footer': {
-                        templateUrl: 'partial/admin_footer.html' ,
-                    },
-                    'content': {
-                        templateUrl: 'partial/add_admin.html' ,
-                        controller: 'addadmin'
-                    },
-
-                }
             }
-        )
+        }
+    )
+        .state('dashboard',{
+            url:"/dashboard",
+            views: {
+
+                'admin_header': {
+                    templateUrl: 'partial/admin_top_menu.html' ,
+                    controller: 'admin_header'
+                },
+                'admin_left': {
+                    templateUrl: 'partial/admin_left.html' ,
+                    //  controller: 'admin_left'
+                },
+                'admin_footer': {
+                    templateUrl: 'partial/admin_footer.html' ,
+                },
+                'content': {
+                    templateUrl: 'partial/dashboard.html' ,
+                    //controller: 'addadmin'
+                },
+
+            }
+        }
+    )
+
+        .state('add-admin',{
+            url:"/add-admin",
+            views: {
+
+                'admin_header': {
+                    templateUrl: 'partial/admin_top_menu.html' ,
+                    controller: 'admin_header'
+                },
+                'admin_left': {
+                    templateUrl: 'partial/admin_left.html' ,
+                    //  controller: 'admin_left'
+                },
+                'admin_footer': {
+                    templateUrl: 'partial/admin_footer.html' ,
+                },
+                'content': {
+                    templateUrl: 'partial/add_admin.html' ,
+                    controller: 'addadmin'
+                },
+
+            }
+        }
+    )
 
         .state('edit-admin',{
                 url:"/edit-admin/:userId",
@@ -619,6 +702,219 @@ r1headzappvar.config(function($stateProvider, $urlRouterProvider,$locationProvid
                 }
             }
         )
+        .state('stuff-list',{
+                url:"/staff-list",
+                views: {
+
+                    'admin_header': {
+                        templateUrl: 'partial/admin_top_menu.html' ,
+                        controller: 'admin_header'
+                    },
+                    'admin_left': {
+                        templateUrl: 'partial/admin_left.html' ,
+                        //  controller: 'admin_left'
+                    },
+                    'admin_footer': {
+                        templateUrl: 'partial/admin_footer.html' ,
+                    },
+                    'content': {
+                        templateUrl: 'partial/stuff/stuff_list.html' ,
+                        controller: 'stufflist'
+                    },
+
+                }
+            }
+        )
+
+        .state('add-stuff',{
+                url:"/add-staff",
+                views: {
+
+                    'admin_header': {
+                        templateUrl: 'partial/admin_top_menu.html' ,
+                        controller: 'admin_header'
+                    },
+                    'admin_left': {
+                        templateUrl: 'partial/admin_left.html' ,
+                        //  controller: 'admin_left'
+                    },
+                    'admin_footer': {
+                        templateUrl: 'partial/admin_footer.html' ,
+                    },
+                    'content': {
+                        templateUrl: 'partial/stuff/add_stuff.html' ,
+                        controller: 'addstuff'
+                    },
+
+                }
+            }
+        )
+
+        .state('edit-stuff',{
+                url:"/edit-staff/:mediaid",
+                views: {
+
+                    'admin_header': {
+                        templateUrl: 'partial/admin_top_menu.html' ,
+                        controller: 'admin_header'
+                    },
+                    'admin_left': {
+                        templateUrl: 'partial/admin_left.html' ,
+                    },
+                    'admin_footer': {
+                        templateUrl: 'partial/admin_footer.html' ,
+                    },
+                    'content': {
+                        templateUrl: 'partial/stuff/edit_stuff.html' ,
+                        controller: 'editstuff'
+                    },
+
+                }
+            }
+        )
+
+
+        .state('article-list',{
+            url:"/article-list",
+            views: {
+
+                'admin_header': {
+                    templateUrl: 'partial/admin_top_menu.html' ,
+                    controller: 'admin_header'
+                },
+                'admin_left': {
+                    templateUrl: 'partial/admin_left.html' ,
+                    //  controller: 'admin_left'
+                },
+                'admin_footer': {
+                    templateUrl: 'partial/admin_footer.html' ,
+                },
+                'content': {
+                    templateUrl: 'partial/media_list_article.html' ,
+                    controller: 'articlelist'
+                },
+
+            }
+        }
+    )
+
+        .state('add-article',{
+            url:"/add-article",
+            views: {
+
+                'admin_header': {
+                    templateUrl: 'partial/admin_top_menu.html' ,
+                    controller: 'admin_header'
+                },
+                'admin_left': {
+                    templateUrl: 'partial/admin_left.html' ,
+                    //  controller: 'admin_left'
+                },
+                'admin_footer': {
+                    templateUrl: 'partial/admin_footer.html' ,
+                },
+                'content': {
+                    templateUrl: 'partial/add_media_article.html' ,
+                    controller: 'addarticle'
+                },
+
+            }
+        }
+    )
+
+        .state('edit-article',{
+            url:"/edit-article/:mediaid",
+            views: {
+
+                'admin_header': {
+                    templateUrl: 'partial/admin_top_menu.html' ,
+                    controller: 'admin_header'
+                },
+                'admin_left': {
+                    templateUrl: 'partial/admin_left.html' ,
+                },
+                'admin_footer': {
+                    templateUrl: 'partial/admin_footer.html' ,
+                },
+                'content': {
+                    templateUrl: 'partial/edit_media_article.html' ,
+                    controller: 'editarticle'
+                },
+
+            }
+        }
+    )
+
+        .state('banner-list',{
+            url:"/banner-list",
+            views: {
+
+                'admin_header': {
+                    templateUrl: 'partial/admin_top_menu.html' ,
+                    controller: 'admin_header'
+                },
+                'admin_left': {
+                    templateUrl: 'partial/admin_left.html' ,
+                    //  controller: 'admin_left'
+                },
+                'admin_footer': {
+                    templateUrl: 'partial/admin_footer.html' ,
+                },
+                'content': {
+                    templateUrl: 'partial/banner/banner_list.html' ,
+                    controller: 'bannerlist'
+                },
+
+            }
+        }
+    )
+
+        .state('add-banner',{
+            url:"/add-banner",
+            views: {
+
+                'admin_header': {
+                    templateUrl: 'partial/admin_top_menu.html' ,
+                    controller: 'admin_header'
+                },
+                'admin_left': {
+                    templateUrl: 'partial/admin_left.html' ,
+                    //  controller: 'admin_left'
+                },
+                'admin_footer': {
+                    templateUrl: 'partial/admin_footer.html' ,
+                },
+                'content': {
+                    templateUrl: 'partial/banner/add_banner.html' ,
+                    controller: 'addbanner'
+                },
+
+            }
+        }
+    )
+
+        .state('edit-banner',{
+            url:"/edit-banner/:id",
+            views: {
+
+                'admin_header': {
+                    templateUrl: 'partial/admin_top_menu.html' ,
+                    controller: 'admin_header'
+                },
+                'admin_left': {
+                    templateUrl: 'partial/admin_left.html' ,
+                },
+                'admin_footer': {
+                    templateUrl: 'partial/admin_footer.html' ,
+                },
+                'content': {
+                    templateUrl: 'partial/banner/edit_banner.html' ,
+                    controller: 'editbanner'
+                },
+
+            }
+        }
+    )
 
         .state('admin-list',{
                 url:"/admin-list",
@@ -788,6 +1084,57 @@ r1headzappvar.config(function($stateProvider, $urlRouterProvider,$locationProvid
                 }
             }
         )
+		
+		.state('contactlist',{
+                url:"/contact-list",
+                views: {
+
+                    'admin_header': {
+                        templateUrl: 'partial/admin_top_menu.html' ,
+                        controller: 'admin_header'
+                    },
+                    'admin_left': {
+                        templateUrl: 'partial/admin_left.html' ,
+                        //  controller: 'admin_left'
+                    },
+                    'admin_footer': {
+                        templateUrl: 'partial/admin_footer.html' ,
+                    },
+                    'content': {
+                        templateUrl: 'partial/contact_list.html' ,
+                        controller: 'contactlist'
+                    },
+
+                }
+            }
+        )
+
+
+        .state('profile',{
+            url:"/profile",
+            views: {
+
+                'admin_header': {
+                    templateUrl: 'partial/myaccount/header.html' ,
+                    // controller: 'header'
+                },
+                'admin_footer': {
+                    templateUrl: 'partial/myaccount/footer.html' ,
+                   // controller:'footer'
+                },
+                'admin_left': {
+                    templateUrl: 'partial/myaccount/left.html' ,
+                    //  controller:'footer'
+                },
+
+                'content': {
+                    templateUrl: 'partial/myaccount/myprofile.html' ,
+                   // controller: 'profile'
+                },
+
+            }
+        }
+    )
 
 
     $locationProvider.html5Mode({
@@ -799,16 +1146,68 @@ r1headzappvar.config(function($stateProvider, $urlRouterProvider,$locationProvid
 
 
 
-r1headzappvar.controller('admin_header', function($compile,$scope,$state,$http,$cookieStore,$rootScope,Upload,$sce,$stateParams,$window) {
 
-    $scope.sdfsdfsd = function(){
-        //console.log(1212);
-        if(angular.element( document.querySelector( 'body' ) ).hasClass('sidebar-collapse')){
-            angular.element( document.querySelector( 'body' ) ).removeClass('sidebar-collapse');
-        }else{
-            angular.element( document.querySelector( 'body' ) ).addClass('sidebar-collapse');
-        }
-    }
+r1headzappvar.controller('homenew', function($compile,$scope,$state,$http,$cookieStore,$rootScope,Upload,$sce,$stateParams,$window) {
+
+    /*$('#carousel-example-generic').carousel();
+    setInterval(function(){
+        $('#carousel-example-generic').carousel('next');
+        console.log(567);
+    },9000);*/
+    $('.item >.active > .homebannerblock').css('transition', 'transform 5000ms linear 0s').css('transform', 'scale(1.05, 1.05)');
+
+    /*item.active .homebannerblock {
+        transition: transform 5000ms linear 0s;
+        *//* This should be based on your carousel setting. For bs, it should be 5second*//*
+        transform: scale(1.05, 1.05);*/
+    //$('.item').eq(0).addClass('active');
+    //$('#carousel-example-generic').carousel('next');
+
+
+    /*setTimeout(function(){
+        $("#myCarousel").carousel('destroy');
+        $('#carousel-example-generic').carousel({
+            interval: 8500
+        });
+        $('#carousel-example-generic').carousel('next');
+
+    },12);*/
+
+
+    $http({
+        method  : 'POST',
+        async:   false,
+        url     : $scope.adminUrl+'bannerlist',
+        // data    : $.param($scope.form),  // pass in data as strings
+        headers : { 'Content-Type': 'application/x-www-form-urlencoded' }
+    }) .success(function(data) {
+        $rootScope.stateIsLoading = false;
+        $scope.bannerlist=data;
+
+
+
+        $('.item >.active > .homebannerblock').css('transition', 'transform 5000ms linear 0s').css('transform', 'scale(1.05, 1.05)');
+
+        /*item.active .homebannerblock {
+         transition: transform 5000ms linear 0s;
+         *//* This should be based on your carousel setting. For bs, it should be 5second*//*
+         transform: scale(1.05, 1.05);*/
+        //$('.item').eq(0).addClass('active');
+        //$('#carousel-example-generic').carousel('next');
+        setTimeout(function(){
+            $('.item:first').addClass('active');
+
+
+            $("#myCarousel").carousel('destroy');
+            $('#carousel-example-generic').carousel({
+                interval: 8500
+            });
+            $('#carousel-example-generic').carousel('next');
+
+        },5000);
+
+
+    });
 
 
 });
@@ -837,7 +1236,7 @@ r1headzappvar.controller('addcontent', function($compile,$scope,$state,$http,$co
         valid_elements : "a[href|target| href=javascript:void(0)],strong,b,img,div[align|class],br,span[class],label,i[class],ul[class],ol[class],li[class],iframe[width|height|src|frameborder|allowfullscreen],sub",
         force_p_newlines : false,
         forced_root_block:'',
-        extended_valid_elements : "label,span[class],i[class]"
+        extended_valid_elements : "label,span[class],i[class],iframe[width|height|src|frameborder|allowfullscreen]"
     };
 
     $scope.form={};
@@ -1154,7 +1553,7 @@ r1headzappvar.controller('contentlist', function($scope,$state,$http,$cookieStor
                 $scope.contenttype[value.parentid]= $scope.tempval.ctype;
             }
         });
-        console.log($scope.contentlist);
+       // console.log($scope.contentlist);
         $scope.contentlistp = $scope.contentlist.slice($scope.begin, parseInt($scope.begin+$scope.perPage));
 
     });
@@ -1606,114 +2005,6 @@ r1headzappvar.controller('editcontent', function(contentservice,$compile,$scope,
 });
 
 
-r1headzappvar.controller('header', function($scope,$state,$cookieStore,$rootScope,contentservice,$uibModal) {
-    $('')
-    $rootScope.items = ['item1', 'item2', 'item3'];
-    $scope.pagename = $state.current.name;
-    $rootScope.userid=0;
-
-    if(typeof ($cookieStore.get('userid'))!='undefined'){
-
-        $rootScope.userid=$cookieStore.get('userid');
-    }
-    if($rootScope.userid==0){
-        $('.editableicon').css('background','none');
-        $('.editableicon').css('cursor','inherit');
-    }
-    else{
-        $('.editableicon').css('background','rgba(0, 0, 0, 0) url("../images/icon-editable.png") no-repeat scroll 0 0');
-        $('.editableicon').css('cursor','pointer');
-    }
-    console.log($scope.pagename);
-    $scope.loginopen=function(){
-        console.log(11);
-        $uibModal.open({
-            animation: true,
-            templateUrl: 'loginmodal.html',
-            controller: 'ModalInstanceCtrl',
-            size: 'lg',
-            scope: $rootScope,
-            resolve: {
-                items: function () {
-                    return true;
-                }
-            }
-        });
-    }
-
-
-    $rootScope.logout= function(){
-    $cookieStore.remove('userid');
-    $cookieStore.remove('useremail');
-    $rootScope.userid=0;
-   // $('.editableicon').css('display','none');
-    //$('.editableicon').hide();
-        $('.editableicon').css('background','none');
-        $('.editableicon').css('cursor','inherit');
-    $state.go('home');
-}
-
-});
-
-r1headzappvar.controller('home', function($http,$scope,$state,$cookieStore,$rootScope,contentservice,$uibModal) {
-//console.log(12);
-    $scope.homesignupsubmit=function(){
-
-        $http({
-            method  : 'POST',
-            async:   false,
-            url     : $scope.adminUrl+'signupinsert',
-             data    : $.param($scope.form),  // pass in data as strings
-            headers : { 'Content-Type': 'application/x-www-form-urlencoded' }
-        }) .success(function(data) {
-            $scope.homesignupForm.reset();
-            $uibModal.open({
-                animation: true,
-                templateUrl: 'signupsuccess.html',
-                controller: 'ModalInstanceCtrl',
-                size: 'lg',
-                scope: $rootScope,
-                resolve: {
-                    items: function () {
-                        return true;
-                    }
-                }
-            });
-        });
-
-    }
-    $scope.contactsubmit=function(){
-        $http({
-            method  : 'POST',
-            async:   false,
-            url     : $scope.adminUrl+'newcontact1',
-            data    : $.param($scope.form),  // pass in data as strings
-            headers : { 'Content-Type': 'application/x-www-form-urlencoded' }
-        }) .success(function(data) {
-        $scope.contactForm.reset();
-        $uibModal.open({
-            animation: true,
-            templateUrl: 'contactsuccess.html',
-            controller: 'ModalInstanceCtrl',
-            size: 'lg',
-            scope: $rootScope,
-            resolve: {
-                items: function () {
-                    return true;
-                }
-            }
-        });
-        });
-    }
-    $scope.functionscroll=function(){
-    console.log(11);
-        $('html, body').animate({
-            scrollTop: $(".homeaboutblock").offset().top
-        }, 2000);
-    }
-
-});
-
 r1headzappvar.controller('aboutus', function($scope,$state,$cookieStore,$rootScope,contentservice) {
 
 
@@ -1735,44 +2026,34 @@ r1headzappvar.controller('ModalInstanceCtrl', function ($state,$cookieStore,$htt
     $scope.cancel = function () {
         $uibModalInstance.dismiss('cancel');
     };
-    $rootScope.email='iftekarkta@gmail.com';
-    $rootScope.password=123456;
-    $scope.popuplogin = function(){
-        $scope.errormsg='';
+
+
+    $scope.submitLogin = function() {
+        $scope.errormsg = 0;
         $rootScope.stateIsLoading = true;
-/*
+
         $http({
-            method  : 'POST',
-            async:   false,
-            url     : $scope.adminUrl+'adminlogin',
-            data    : $.param($scope.form),  // pass in data as strings
-            headers : { 'Content-Type': 'application/x-www-form-urlencoded' }
-        }) .success(function(data) {*/
+            method: 'POST',
+            async: false,
+            url: $scope.adminUrl + 'login',
+            data: $.param($scope.form),  // pass in data as strings
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+        }).success(function (data) {
 
-
-            if($scope.form.email == $rootScope.email && $scope.form.password == $rootScope.password) {
-
+            if(data.length){
                 $uibModalInstance.dismiss('cancel');
 
+                $cookieStore.put('userid', data[0]._id);
+                $cookieStore.put('userdet', data[0]);
 
-                $cookieStore.put('userid', 1);
-                $cookieStore.put('useremail',  $rootScope.email);
-
-                if(typeof ($cookieStore.get('userid'))!='undefined'){
-
-                    $rootScope.userid=$cookieStore.get('userid');
-                }
-                $('.editableicon').css('background','rgba(0, 0, 0, 0) url("../images/icon-editable.png") no-repeat scroll 0 0');
-                $('.editableicon').css('cursor','pointer');
-               // $('.editableicon').css('display','block');
-                $state.go('home');
-
+                $state.go('dashboard');
+                return;
 
             }else{
-                $rootScope.stateIsLoading = false;
-                $scope.errormsg = 'Invalid email/password';
+                $scope.errormsg = 1;
             }
 
+        });
 
     }
 

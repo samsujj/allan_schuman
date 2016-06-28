@@ -1,5 +1,5 @@
 {
-  "name": "Urban-Headz",
+  "name": "Allan-Schuman",
   "version": "0.0.2",
   "description": "Simple node application.",
   "main": "server.js",
@@ -11,7 +11,16 @@
     "mysql": "2.10.1",
     "mongoose": "^3.7.1",
     "fs": "0.0.2",
-    "mongodb":"2.1.0",
-    "multer": "1.1.0"
+    "mongodb": "2.1.0",
+    "multer": "1.1.0",
+    "nodemailer":"0.7.1",
+    "node-cryptojs-aes":"0.4.0"
+  },
+  "devDependencies": {
+    "express": "^4.13.3",
+    "gulp": "^3.9.1",
+    "gulp-livereload": "^3.8.1",
+    "gulp-nodemon": "^2.1.0",
+    "gulp-notify": "^2.2.0"
   }
 }

@@ -794,6 +794,11 @@ app2.controller('editcontent', function(contentservice,$compile,$scope,$state,$h
 
 
 app2.controller('home', function($scope,$state,$cookieStore,$rootScope,contentservice) {
+    $('#carousel-example-generic').carousel();
+    setInterval(function(){
+        $('#carousel-example-generic').carousel('next');
+        console.log(567);
+    },3000);
 
 
 
