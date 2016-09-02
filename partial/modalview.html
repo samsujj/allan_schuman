@@ -43,6 +43,7 @@
                                                    ng-model="form.description"
                                                     >
                                             <!-- <span class="errormsg">erroe msg</span>-->
+                                            <div><img ng-show="submitload"  class="imgclass3" src="images/submitimg.gif" ></div>
                                         </div>
 
 
@@ -127,13 +128,19 @@
                                                 <input
                                                         type="file"
                                                         ngf-select
-                                                        ng-model="cfile"
+
+                                                         ng-model="cfile"
                                                         name="cfile"
                                                         ngf-pattern="'image/*'"
                                                         accept="image/*"
                                                         />
 
-                                                <span class="clearfix f1  " ><img src="/nodeserver/uploads/{{form.image_url_url}}" /></span>
+                                                <div class="imgclasswrapper">
+                                                <span class="clearfix f1" ><img class="imgf" src="/nodeserver/uploads/{{form.image_url_url}}" /></span></div>
+                                                <div><img ng-hide="loadershow" class="imgclass" src="images/loading.gif" ></div>
+                                                <div><img ng-hide="progressshow" class="imgclass2" src="images/processing.gif" ></div>
+
+
                                         <span  ng-repeat=" item in form.resumearrn track by $index " class="clearfix  f1 " >
                                             <div>
                                                 {{item}}
@@ -156,9 +163,12 @@
 
                                 </div><!-- /.box-body -->
 
+                                    <div class="clearfix"></div>
                                     <div class="box-footer" style="background:none; height:auto; padding-bottom:0px; padding-top:0px;">
-                                        <button type="submit" class="btn btn-primary">Submit</button>
+                                        <button ng-disabled="isDisabled" type="submit" class="btn btn-primary">Submit</button>
                                         <button type="button" ng-click="getpreview()" class="btn btn-primary">Preview</button>
+                                        <button ng-show="cimage"  type="button" ng-click="imagecrop()" class="btn btn-primary">Crop</button>
+                                      <!--  <input ng-show="cimage"  class="btn btn-primary" type="button" ng-click="imagecrop()" value="Crop">-->
                                     </div>
                                 </form>
                             </div><!-- /.box -->
@@ -176,17 +186,74 @@
 
 
 
-        <div ng-show="!iseditableformon" ng-bind-html="previewcontent|sanitize123"></div>
+        <div class="imgpreview" ng-show="!iseditableformon" ng-bind-html="previewcontent|sanitize123"></div>
 
 
 
     </div>
-    <div class="modal-footer">
-        <select ng-model="contenetselected" ng-change="update()" ng-options="x as timeConverter(x.addtime) for x in currentlistdata" >
+    <div class="modal-footer modelft">
+        <select ng-model="contenetselected" ng-change="update()" ng-options="x as timeConverter(x.addtime) for x in currentlistdata" class="selectbox" >
             <!-- <option  ng-repeat="x in currentlistdata">{{timeConverter(x.addtime)}}</option>-->
         </select>
-        <button class="btn btn-primary" type="button" ng-click="ok()">OK</button>
-        <button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
-        <button class="btn btn-warning" ng-click="iseditableformon = !iseditableformon" ng-show="!iseditableformon" type="button" >Edit</button>
+        <button class="btn btn-primary btnok" type="button" ng-click="ok()">CLOSE</button>
+        <!--<button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>-->
+        <button class="btn btn-warning btnok" ng-click="iseditableformon = !iseditableformon" ng-show="!iseditableformon" type="button" >BACK</button>
     </div>
+</script>
+
+
+
+<script type="text/ng-template" id="commonmymodal1">
+
+    <div class="modal-header clsbtn">
+
+        <a class="close" ng-click="modalClose()"><span>&times;</span></a>
+        <!--<h4>&nbsp;</h4>-->
+    </div>
+
+    <div class="modal-body">
+
+        <div class="imgcrop" ng-show="pLoad">Loading Image...<img src="images/ajax_loading.gif" /></div>
+        <div class="imgclasssave" ng-show="cropsaving">Saving...<img src="images/ajax_loading.gif" /></div>
+
+        <div class="image-editor1 imagecropdivcontent">
+
+            <div style="overflow:hidden; width:783px; margin:0 auto;">
+
+                <div class="cropit-image-preview-container">
+
+                    <div class="cropit-image-preview"  ng-mousemove="changepreview1()"></div>
+
+                </div>
+
+            </div>
+
+            <div style="margin-top:20px;">
+
+                <input type="range" class="cropit-image-zoom-input"  name="range1" ng-model="range1" ng-change="changepreview1()">
+
+            </div>
+
+        </div>
+
+        <div style="overflow:hidden; margin:10px auto; margin-top:14px; display:block; width:391px;">
+
+            <img style="width: 100%;" src="{{imagedata2}}" ng-show="imagedata2">
+
+        </div>
+
+    </div>
+
+    <div class="modal-footer">
+
+        <div style="width:118px; margin:0 auto;">
+
+            <a href="javascript:void(0);" class="btn btn btn-primary" ng-click="crop1()" data-original-title="" style="width:116px; margin:4px;" ng-disabled="cropsaveDisabled">Crop & Save</a>
+            <div class="imgcrop1" ng-show="cropsaving">Saving...<img src="images/ajax_loading.gif" /></div>
+            <!--<a href="javascript:void(0);" class="btn btn btn-primary" ng-click="modalClose()" data-original-title="" style="width:62px; margin:4px;">Close</a>-->
+
+        </div>
+
+    </div>
+
 </script>

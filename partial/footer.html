@@ -42,17 +42,24 @@
 
             <ul>
 
-                <li> <a ui-sref="home" href="javascript:void(0)">Home</a></li>
+                <li> <a ui-sref="home" href="javascript:void(0)"><content name='homelink57beb9ae6d2917be592c2f2a' id='57beb9ae6d2917be592c2f2a' > </content></a></li>
 
-                <li> <a ui-sref="areasofexpertise" href="javascript:void(0)">Area of Expertise</a></li>
+                <li> <a ui-sref="areasofexpertise" href="javascript:void(0)"><content name='areasofexpertise_link57bebb5b6d2917be592c2f2b' id='57bebb5b6d2917be592c2f2b' > </content></a></li>
 
-                <li> <a ui-sref="staff" href="javascript:void(0)">Staff</a></li>
+                <li> <a ui-sref="staff" href="javascript:void(0)"><content name='Stafflink57bebb926d2917be592c2f2c' id='57bebb926d2917be592c2f2c' > </content></a></li>
+                <li> <a ui-sref="testimonial" href="javascript:void(0)"><content name='testimonialslink57bebbc36d2917be592c2f2d' id='57bebbc36d2917be592c2f2d' > </content></a></li>
 
-                <li> <a ui-sref="media-articles" href="javascript:void(0)">Media</a></li>
+                <li> <a ui-sref="media-articles" href="javascript:void(0)"><content name='medialink57bebd176d2917be592c2f2e' id='57bebd176d2917be592c2f2e' > </content></a></li>
 
-                <li> <a ui-sref="probono" href="javascript:void(0)">Pro Bono Work</a></li>
+                <li> <a ui-sref="probono" href="javascript:void(0)"><content name='ProBonoWorklink57bebe976d2917be592c2f2f' id='57bebe976d2917be592c2f2f' > </content></a></li>
+                <li> <a ui-sref="sfactivities" href="javascript:void(0)"><content name='SFActivitieslink57bec11d6d2917be592c2f30' id='57bec11d6d2917be592c2f30' > </content></a></li>
 
-                <li> <a ui-sref="contact" href="javascript:void(0)">Contact us</a></li>
+
+                <li> <a ui-sref="contact" href="javascript:void(0)"><content name='contactlink57bec16f6d2917be592c2f31' id='57bec16f6d2917be592c2f31' > </content></a></li>
+
+                <li> <a href="javascript:void(0)" ng-click="loginopen()"  ng-hide="rootUserid">Login</a></li>
+                <li><a ui-sref="logout" ng-show="rootUserid">Logout</a></li>
+                <li> <a ui-sref="dashboard"  ng-show="rootUserid">Dashboard</a></li>
 
 
 
@@ -70,21 +77,33 @@
 
         <div class="social_icon_block">
 
-            <a href="javascript:void(0)"><img src="../images/sicon1.png"></a>
+
+
+
+            <!--<div class="fb_newlink"> <a href="https://www.facebook.com/pages/Allan-M-Schuman-Associates/131376440532511
+" target="_blank">Like Us On <img src="../images/sicon1.png"></a>    </div>-->
+
+            <!--
+            <a href="https://www.facebook.com/pages/Allan-M-Schuman-Associates/131376440532511
+" target="_blank"><img src="../images/sicon1.png"></a>
 
             <a href="javascript:void(0)"><img src="../images/sicon2.png"></a>
 
-            <a href="javascript:void(0)"><img src="../images/sicon3.png"></a>
 
 
+            <a href="javascript:void(0)"><img src="../images/sicon3.png"></a>-->
+
+                 <div class="clearfix"></div>
 
         </div>
 
+<!--
 <div class="divlog">
     <a href="javascript:void(0)" ng-click="loginopen()" class="loginlink" ng-hide="rootUserid">Login</a>
     <a ui-sref="logout" class="loginlink" ng-show="rootUserid">Logout</a>
     <a ui-sref="dashboard" class="dashboard" ng-show="rootUserid">Dashboard</a>
 </div>
+-->
 
 
 
@@ -108,7 +127,7 @@
             <h2>User Login</h2>
         </div>
         <form angular-validator-submit="submitLogin()" id="loginform" name="loginform" role="form" novalidate angular-validator>
-            <div class="control-label has-error validationMessage" ng-show="errormsg">Invalid User Name / Password</div>
+            <div class="error" ng-show="errormsg">Invalid User Name / Password</div>
 
         <div class="form-group form-padding email_div">
             <input type="email" class="form-control" placeholder="Enter email" name="email"
@@ -132,3 +151,4 @@
     </div>
 </script>
 
+<div id="lastblock"></div>

@@ -6,8 +6,6 @@
 var CryptoJS = require("crypto-js/aes");
 
 
-
-
 var express = require('express');
 
 //var busboy = require('connect-busboy'); //middleware for form/file upload
@@ -60,6 +58,14 @@ var storage = multer.diskStorage({ //multers disk storage settings
     }
 });
 
+
+var EventEmitter = require('events').EventEmitter;
+
+const emitter = new EventEmitter()
+//emitter.setMaxListeners(100)
+// or 0 to turn off the limit
+emitter.setMaxListeners(0)
+
 var upload = multer({ //multer settings
     storage: storage
 }).single('file');
@@ -91,21 +97,33 @@ app.use(function(req, res, next) { //allow cross origin requests
 
 /** API path that will upload the files */
 app.post('/uploads', function(req, res) {
-
     datetimestamp = Date.now();
     upload(req,res,function(err){
+
         if(err){
             res.json({error_code:1,err_desc:err});
             return;
         }
+
+
         res.json({error_code:0,filename:filename});
     });
 });
 
 var mongodb = require('mongodb');
+var db;
 var url = 'mongodb://localhost:27017/testdb';
 
 var MongoClient = mongodb.MongoClient;
+
+MongoClient.connect(url, function (err, database) {
+    if (err) {
+        console.log(err);
+
+    }else{
+        db=database;
+
+    }});
 
 
 
@@ -233,13 +251,13 @@ app.get('/',function(req,resp){
 app.get('/contentlist', function (req, resp) {
 
 
-    MongoClient.connect(url, function (err, db) {
+   /* MongoClient.connect(url, function (err, db) {
         if (err) {
           //  console.log('Unable to connect to the mongoDB server. Error:', err);
         } else {
             //HURRAY!! We are connected. :)
            // console.log('Connection established to mongo db', url);
-
+*/
 
             var collection = db.collection('content_table_allanschuman');
 
@@ -257,7 +275,7 @@ app.get('/contentlist', function (req, resp) {
              //   console.log('-----------------------------------');
             //    console.log(items.length);
                 resp.send(JSON.stringify(items));
-                db.close();
+                //db.close();
                 ///dbresults.push(items);
             });
 
@@ -268,8 +286,8 @@ app.get('/contentlist', function (req, resp) {
 
             //Close connection
             //db.close();
-        }
-    });
+        //}
+    //});
 
 
 
@@ -291,14 +309,14 @@ app.get('/contentlistbyid/:id', function (req, resp) {
     });*/
 
 
-    MongoClient.connect(url, function (err, db) {
+    /*MongoClient.connect(url, function (err, db) {
         if (err) {
           //  console.log('Unable to connect to the mongoDB server. Error:', err);
         } else {
             //HURRAY!! We are connected. :)
 
          //   console.log('Connection established to mongo db', url);
-
+*/
 
             var o_id = new mongodb.ObjectID(req.params.id);
 
@@ -310,13 +328,13 @@ app.get('/contentlistbyid/:id', function (req, resp) {
              //   console.log('-----------------------------------');
               //  console.log(items.length);
                 resp.send(JSON.stringify(items));
-                db.close();
+               // db.close();
 
             });
 
 
-        }
-    });
+      //  }
+    //});
 });
 
 
@@ -346,10 +364,10 @@ app.post('/addcontent', function (req, resp) {
 
 
 
-    MongoClient.connect(url, function (err, db) {
+   /* MongoClient.connect(url, function (err, db) {
         if (err) {
           //  console.log('Unable to connect to the mongoDB server. Error:', err);
-        } else {
+        } else {*/
             //HURRAY!! We are connected. :)
           //  console.log('Connection established to mongo db', url);
 
@@ -380,8 +398,8 @@ app.post('/addcontent', function (req, resp) {
 
             //Close connection
             //db.close();
-        }
-    });
+       /* }
+    });*/
 
 
 
@@ -416,10 +434,10 @@ app.post('/addcontact', function (req, resp) {
 
 
 
-    MongoClient.connect(url, function (err, db) {
+   /* MongoClient.connect(url, function (err, db) {
         if (err) {
            // console.log('Unable to connect to the mongoDB server. Error:', err);
-        } else {
+        } else {*/
             //HURRAY!! We are connected. :)
           //  console.log('Connection established to mongo db', url);
 
@@ -453,11 +471,12 @@ app.post('/addcontact', function (req, resp) {
                     });
 
                     var mail = {
-                        from: req.body.fullname+" <"+req.body.email+">",
-                        to: "debasiskar007@gmail.com,debasis218@gmail.com",
+                        from: "Support <"+req.body.email+">",
+                       // to: "debasiskar007@gmail.com,debasis218@gmail.com,lannah@betoparedes.com",
+                        to: "schumanwebsite@gmail.com",
                         subject: "New Contact Form Submission by "+req.body.fullname+" on allanschuman.com",
                         //text: "Node.js New world for me",
-                        html: "<b>Name</b> :   "+req.body.fullname +"<br><b>Email</b> :   "+req.body.email+ "<br><b>Phone Number</b> :   "+req.body.phone +"<br><b>Address</b> :   "+req.body.address+"<br><b>Interest</b> :   "+req.body.interest+"<br><b>Message</b> :   "+req.body.comments
+                        html: "<b>Name</b> :   "+req.body.fullname +"<br><b>Email</b> :   "+req.body.email+ "<br><b>Phone Number</b> :   "+req.body.phone +"<br><b>Interest</b> :   "+req.body.interest+"<br><b>Message</b> :   "+req.body.comments
                     }
 
                     smtpTransport.sendMail(mail, function(error, response){
@@ -482,8 +501,8 @@ app.post('/addcontact', function (req, resp) {
 
             //Close connection
             //db.close();
-        }
-    });
+     /*   }
+    });*/
 
 
 
@@ -524,6 +543,7 @@ app.post('/rolelist', function (req, resp) {
              //   console.log('-----------------------------------');
               //  console.log(items.length);
                 resp.send(JSON.stringify(items));
+                db.close();
                 ///dbresults.push(items);
             });
 
@@ -553,6 +573,7 @@ app.post('/contactlist', function (req, resp) {
            //     console.log('-----------------------------------');
            //     console.log(items.length);
                 resp.send(JSON.stringify(items));
+                db.close();
                 ///dbresults.push(items);
             });
 
@@ -583,6 +604,7 @@ app.post('/articlelist', function (req, resp) {
              //   console.log('-----------------------------------');
              //   console.log(items.length);
                 resp.send(JSON.stringify(items));
+                db.close();
                 ///dbresults.push(items);
             });
 
@@ -620,6 +642,7 @@ app.post('/login', function (req, resp) {
             //    console.log('-----------------------------------');
             //    console.log(items.length);
                 resp.send(JSON.stringify(items));
+                db.close();
                 ///dbresults.push(items);
             });
 
@@ -651,6 +674,7 @@ app.get('/adminlist', function (req, resp) {
              //   console.log(items.length);
                 resp.send(JSON.stringify(items));
                 ///dbresults.push(items);
+                db.close();
             });
 
 
@@ -667,6 +691,8 @@ app.get('/adminlist', function (req, resp) {
 app.get('/medialist', function (req, resp) {
 
     MongoClient.connect(url, function (err, db) {
+      //  var o_id =new mongodb.ObjectID(req.body.video_type);
+         var o_id = new mongodb.ObjectID(1);
         if (err) {
          //   console.log('Unable to connect to the mongoDB server. Error:', err);
         } else {
@@ -675,12 +701,14 @@ app.get('/medialist', function (req, resp) {
 
             var collection = db.collection('media_youtube');
 
-            collection.find().toArray(function(err, items) {
+            collection.find().sort({'priority':-1}).toArray(function(err, items) {
+              //  collection.find({video_type:o_id}).toArray(function(err, items) {
 
          //       console.log(items);
          //       console.log('-----------------------------------');
          //       console.log(items.length);
                 resp.send(JSON.stringify(items));
+                db.close();
                 ///dbresults.push(items);
             });
 
@@ -694,12 +722,44 @@ app.get('/medialist', function (req, resp) {
 
 });
 
-app.get('/stafflist', function (req, resp) {
+app.get('/probonomedialist', function (req, resp) {
+    MongoClient.connect(url, function (err, db) {            //HURRAY!! We are connected. :)
 
+        //  console.log('Connection established to mongo db', url);
+
+
+       // var o_id = new mongodb.ObjectID(req.params.id);
+
+
+        var collection = db.collection('media_youtube');
+
+        collection.find({video_type:2}).toArray(function(err, items) {
+
+            //    console.log(items);
+            //      console.log('-----------------------------------');
+            //      console.log(items.length);
+            resp.send(JSON.stringify(items));
+            db.close();
+
+        });
+
+
+
+        if (err) {
+            //    console.log('Unable to connect to the mongoDB server. Error:', err);
+        } else {
+        }
+    });
+
+});
+
+
+app.get('/stafflist', function (req, resp) {
+/*
     MongoClient.connect(url, function (err, db) {
         if (err) {
          //   console.log('Unable to connect to the mongoDB server. Error:', err);
-        } else {
+        } else {*/
             //HURRAY!! We are connected. :)
          //   console.log('Connection established to mongo db', url);
 
@@ -711,13 +771,14 @@ app.get('/stafflist', function (req, resp) {
           //      console.log('-----------------------------------');
           //      console.log(items.length);
                 resp.send(JSON.stringify(items));
+                //db.close();
                 ///dbresults.push(items);
             });
 
 
             //db.close();
-        }
-    });
+       // }
+    //});
 
 
 
@@ -754,6 +815,7 @@ app.post('/addrole', function (req, resp) {
                     resp.send('Inserted %d documents into the "users" collection. The documents inserted with "_id" are:', result.length, result);
 
 
+                    db.close();
                 }
             });
 
@@ -800,6 +862,45 @@ app.post('/addadmin', function (req, resp) {
                     resp.send('Inserted %d documents into the "users" collection. The documents inserted with "_id" are:', result.length, result);
 
 
+                    db.close();
+                }
+            });
+
+
+        }
+    });
+
+
+});
+app.post('/addimagegallery', function (req, resp) {
+
+
+
+    value1 = {title: req.body.title, status: 1, imagefile: req.body.imagefile,priority:req.body.priority};
+   // console.log("Insert command");
+
+
+    MongoClient.connect(url, function (err, db) {
+        if (err) {
+      //      console.log('Unable to connect to the mongoDB server. Error:', err);
+        } else {
+            //HURRAY!! We are connected. :)
+       //     console.log('Connection established to mongo db', url);
+
+
+            var collection = db.collection('imagegallery');
+
+
+            collection.insert([value1], function (err, result) {
+                if (err) {
+             //       console.log(err);
+             //       console.log('err-----mingo .. vag ');
+                } else {
+              //      console.log('Inserted %d documents into the "users" collection. The documents inserted with "_id" are:', result.length, result);
+                    resp.send('Inserted %d documents into the "users" collection. The documents inserted with "_id" are:', result.length, result);
+
+
+                    db.close();
                 }
             });
 
@@ -810,10 +911,13 @@ app.post('/addadmin', function (req, resp) {
 
 });
 
+
+
 app.post('/addstaff', function (req, resp) {
 
     var addtime=Date.now();
     var role_status=1;
+
 
     value1 = {title: req.body.title, designation: req.body.designation, email: req.body.email,phone:req.body.phone,description:req.body.description,picture:req.body.picture,type:req.body.type,status:1,create_time:req.addtime,featured:req.body.featured,priority:req.body.priority};
   //  console.log("Insert command");
@@ -838,6 +942,7 @@ app.post('/addstaff', function (req, resp) {
            //         console.log('Inserted %d documents into the "users" collection. The documents inserted with "_id" are:', result.length, result);
                     resp.send('Inserted %d documents into the "users" collection. The documents inserted with "_id" are:', result.length, result);
 
+                    db.close();
 
                 }
             });
@@ -854,7 +959,7 @@ app.post('/addarticle', function (req, resp) {
     var addtime=Date.now();
     var role_status=1;
 
-    value1 = {title: req.body.title,description: req.body.description, createdby: req.body.createdby,createdtime:addtime,image: req.body.image,status: 1,video: req.body.video };
+    value1 = {title: req.body.title,description: req.body.description, createdby: req.body.createdby,createdtime:addtime,image: req.body.image,status: 1,video: req.body.video,externallink: req.body.externallink,priority:req.body.priority};
 
 
     MongoClient.connect(url, function (err, db) {
@@ -876,6 +981,7 @@ app.post('/addarticle', function (req, resp) {
                 //    console.log('Inserted %d documents into the "users" collection. The documents inserted with "_id" are:', result.length, result);
                     resp.send('Inserted %d documents into the "users" collection. The documents inserted with "_id" are:', result.length, result);
 
+                    db.close();
 
                 }
             });
@@ -893,7 +999,7 @@ app.post('/addmedia', function (req, resp) {
     var addtime=Date.now();
     var role_status=1;
 
-    value1 = {media_name: req.body.media_name,media_file: req.body.media_file, priority: req.body.priority,status: 1,priority: req.body.priority,status: 1,add_time: addtime };
+    value1 = {media_name: req.body.media_name,media_file: req.body.media_file, priority: req.body.priority,status: 1,priority: req.body.priority,status: 1,add_time: addtime,video_type:req.body.video_type };
   //  console.log("Insert command");
 
 
@@ -916,6 +1022,7 @@ app.post('/addmedia', function (req, resp) {
           ///          console.log('Inserted %d documents into the "users" collection. The documents inserted with "_id" are:', result.length, result);
                     resp.send('Inserted %d documents into the "users" collection. The documents inserted with "_id" are:', result.length, result);
 
+                    db.close();
 
                 }
             });
@@ -926,8 +1033,6 @@ app.post('/addmedia', function (req, resp) {
 
 
 });
-
-
 
 
 app.get('/roledetails/:id', function (req, resp) {
@@ -950,6 +1055,7 @@ app.get('/roledetails/:id', function (req, resp) {
           //      console.log('-----------------------------------');
           //      console.log(items.length);
                 resp.send(JSON.stringify(items));
+                db.close();
 
             });
 
@@ -978,6 +1084,7 @@ app.post('/admindetails', function (req, resp) {
             //    console.log('-----------------------------------');
             //    console.log(items.length);
                 resp.send(JSON.stringify(items));
+                db.close();
 
             });
 
@@ -1034,6 +1141,7 @@ app.post('/staffdetails', function (req, resp) {
            //     console.log('-----------------------------------');
             //    console.log(items.length);
                 resp.send(JSON.stringify(items));
+                db.close();
 
             });
 
@@ -1063,6 +1171,7 @@ app.post('/mediadetails', function (req, resp) {
             //    console.log('-----------------------------------');
             //    console.log(items.length);
                 resp.send(JSON.stringify(items));
+                db.close();
 
             });
 
@@ -1091,7 +1200,10 @@ app.post('/deleterole', function (req, resp) {
                     resp.send("failed");
                     throw err;
                 }
-                else resp.send("success");
+                else {
+                    resp.send("success");
+                    db.close();
+                }
             });
 
 
@@ -1118,7 +1230,10 @@ app.post('/deletestaff', function (req, resp) {
                     resp.send("failed");
                     throw err;
                 }
-                else resp.send("success");
+                else {
+                    resp.send("success");
+                    db.close();
+                }
             });
 
 
@@ -1145,7 +1260,10 @@ app.post('/deletearticle', function (req, resp) {
                     resp.send("failed");
                     throw err;
                 }
-                else resp.send("success");
+                else {
+                    resp.send("success");
+                    db.close();
+                }
             });
 
 
@@ -1173,7 +1291,10 @@ app.post('/deletemedia', function (req, resp) {
                     resp.send("failed");
                     throw err;
                 }
-                else resp.send("success");
+                else {
+                    resp.send("success");
+                    db.close();
+                }
             });
 
 
@@ -1202,7 +1323,10 @@ app.post('/deleteadmin', function (req, resp) {
                     resp.send("failed");
                     throw err;
                 }
-                else resp.send("success");
+                else {
+                    resp.send("success");
+                    db.close();
+                }
             });
 
 
@@ -1229,7 +1353,11 @@ app.post('/roleupdates', function (req, resp) {
                     resp.send("failed");
                     throw err;
                 }
-                else resp.send("success");
+                else {
+                    resp.send("success");
+                    db.close();
+
+                }
             });
 
 
@@ -1256,7 +1384,11 @@ app.post('/adminupdates', function (req, resp) {
                     resp.send("failed");
                     throw err;
                 }
-                else resp.send("success");
+                else {
+                    resp.send("success");
+                    db.close();
+
+                }
             });
 
 
@@ -1282,7 +1414,11 @@ app.post('/staffupdates', function (req, resp) {
                     resp.send("failed");
                     throw err;
                 }
-                else resp.send("success");
+                else {
+                    resp.send("success");
+                    db.close();
+
+                }
             });
 
 
@@ -1305,12 +1441,16 @@ app.post('/mediaupdates', function (req, resp) {
             var o_id = new mongodb.ObjectID(req.body.id);
 
             var collection = db.collection('media_youtube');
-            collection.update({_id: o_id}, {$set: {media_name: req.body.media_name,media_file: req.body.media_file,priority: req.body.priority }},function(err, results) {
+            collection.update({_id: o_id}, {$set: {media_name: req.body.media_name,media_file: req.body.media_file,priority: parseInt(req.body.priority),video_type:req.body.video_type }},function(err, results) {
                 if (err){
                     resp.send("failed");
                     throw err;
                 }
-                else resp.send("success");
+                else {
+                    resp.send("success");
+                    db.close();
+
+                }
             });
 
 
@@ -1331,12 +1471,16 @@ app.post('/articleupdates', function (req, resp) {
             var o_id = new mongodb.ObjectID(req.body.id);
 
             var collection = db.collection('article');
-            collection.update({_id: o_id}, {$set: {title: req.body.title,description: req.body.description,image: req.body.image,status:req.body.status,createdby:req.body.createdby,video:req.body.video }},function(err, results) {
+            collection.update({_id: o_id}, {$set: {title: req.body.title,description: req.body.description,image: req.body.image,status:req.body.status,createdby:req.body.createdby,video:req.body.video,externallink: req.body.externallink,priority:req.body.priority }},function(err, results) {
                 if (err){
                     resp.send("failed");
                     throw err;
                 }
-                else resp.send("success");
+                else {
+                    resp.send("success");
+                    db.close();
+
+                }
             });
 
 
@@ -1366,7 +1510,11 @@ app.post('/adminupdatestatus', function (req, resp) {
                     resp.send("failed");
                     throw err;
                 }
-                else resp.send("success");
+                else {
+                    resp.send("success");
+                    db.close();
+
+                }
             });
 
 
@@ -1393,7 +1541,11 @@ app.post('/articleupdatestatus', function (req, resp) {
                     resp.send("failed");
                     throw err;
                 }
-                else resp.send("success");
+                else {
+                    resp.send("success");
+                    db.close();
+
+                }
             });
 
 
@@ -1419,7 +1571,11 @@ app.post('/staffupdatestatus', function (req, resp) {
                     resp.send("failed");
                     throw err;
                 }
-                else resp.send("success");
+                else {
+                    resp.send("success");
+                    db.close();
+
+                }
             });
 
 
@@ -1447,7 +1603,11 @@ app.post('/mediaupdatestatus', function (req, resp) {
                     resp.send("failed");
                     throw err;
                 }
-                else resp.send("success");
+                else {
+                    resp.send("success");
+                    db.close();
+
+                }
             });
 
 
@@ -1456,23 +1616,247 @@ app.post('/mediaupdatestatus', function (req, resp) {
 
 });
 
+/****************Testimonial Module[start]**************/
 
-/****************Banner Module[start]**************/
+app.post('/addtestimonial', function (req, resp) {
 
-app.post('/bannerlist', function (req, resp) {
+    var addtime=Date.now();
+    var role_status=1;
+
+    value1 = {title: req.body.title,testimonial: req.body.testimonial, testimonial_image: req.body.file,priority: req.body.priority,status: 1,add_time: addtime };
+    //  console.log("Insert command");
+
 
     MongoClient.connect(url, function (err, db) {
         if (err) {
-          //  console.log('Unable to connect to the mongoDB server. Error:', err);
+            //      console.log('Unable to connect to the mongoDB server. Error:', err);
         } else {
             //HURRAY!! We are connected. :)
-          //  console.log('Connection established to mongo db', url);
+            //     console.log('Connection established to mongo db', url);
 
-            var collection = db.collection('banner_db');
+
+            var collection = db.collection('testimonial');
+
+
+            collection.insert([value1], function (err, result) {
+                if (err) {
+                    //            console.log(err);
+                    //            console.log('err-----mingo .. vag ');
+                } else {
+                    ///          console.log('Inserted %d documents into the "users" collection. The documents inserted with "_id" are:', result.length, result);
+                    resp.send('Inserted %d documents into the "users" collection. The documents inserted with "_id" are:', result.length, result);
+
+                    db.close();
+                }
+            });
+
+
+        }
+    });
+
+
+});
+app.get('/testimoniallist', function (req, resp) {
+
+   /* MongoClient.connect(url, function (err, db) {
+        if (err) {
+              console.log('Unable to connect to the mongoDB server. Error:', err);
+        } else {*/
+            //HURRAY!! We are connected. :)
+            //  console.log('Connection established to mongo db', url);
+
+            var collection = db.collection('testimonial');
 
             collection.find().toArray(function(err, items) {
 
-               resp.send(JSON.stringify(items));
+                resp.send(JSON.stringify(items));
+                //db.close();
+            });
+
+
+            //db.close();
+      /*  }
+    });*/
+
+
+
+
+});
+app.post('/testimonialdetails', function (req, resp) {
+    MongoClient.connect(url, function (err, db) {
+        if (err) {
+            console.log('Unable to connect to the mongoDB server. Error:', err);
+        } else {
+            //HURRAY!! We are connected. :)
+
+            //   console.log('Connection established to mongo db', url);
+
+
+            var o_id = new mongodb.ObjectID(req.body.id);
+
+            var collection = db.collection('testimonial');
+
+            collection.find({_id:o_id}).toArray(function(err, items) {
+
+                //     console.log(items);
+                //     console.log('-----------------------------------');
+                //    console.log(items.length);
+                resp.send(JSON.stringify(items));
+                db.close();
+
+            });
+
+        }
+    });
+
+});
+app.post('/testimonialupdates', function (req, resp) {
+    MongoClient.connect(url, function (err, db) {
+        if (err) {
+            console.log('Unable to connect to the mongoDB server. Error:', err);
+        } else {
+            //HURRAY!! We are connected. :)
+
+            //    console.log('Connection established to mongo db', url);
+
+
+            var o_id = new mongodb.ObjectID(req.body.id);
+
+            var collection = db.collection('testimonial');
+            collection.update({_id: o_id}, {$set: {title: req.body.title,testimonial: req.body.testimonial, testimonial_image: req.body.file,priority: req.body.priority }},function(err, results) {
+                if (err){
+                    resp.send("failed");
+                    throw err;
+                }
+                else {
+                    resp.send("success");
+                    db.close();
+
+                }
+            });
+
+
+        }
+    });
+
+});
+
+app.post('/testimonialupdatestatus', function (req, resp) {
+    MongoClient.connect(url, function (err, db) {
+        if (err) {
+            console.log('Unable to connect to the mongoDB server. Error:', err);
+        } else {
+            //HURRAY!! We are connected. :)
+
+            //      console.log('Connection established to mongo db', url);
+
+
+            var o_id = new mongodb.ObjectID(req.body.id);
+
+            var collection = db.collection('testimonial');
+            collection.update({_id: o_id}, {$set: {status: req.body.status}},function(err, results) {
+                if (err){
+                    resp.send("failed");
+                    throw err;
+                }
+                else {
+                    resp.send("success");
+                    db.close();
+
+                }
+            });
+
+
+        }
+    });
+
+});
+app.post('/deletetestimonial', function (req, resp) {
+    MongoClient.connect(url, function (err, db) {
+        if (err) {
+            console.log('Unable to connect to the mongoDB server. Error:', err);
+        } else {
+            //HURRAY!! We are connected. :)
+
+            //    console.log('Connection established to mongo db', url);
+
+
+            var o_id = new mongodb.ObjectID(req.body.id);
+
+            var collection = db.collection('testimonial');
+            collection.deleteOne({_id: o_id}, function(err, results) {
+                if (err){
+                    resp.send("failed");
+                    throw err;
+                }
+                else {
+                    resp.send("success");
+                    db.close();
+
+                }
+            });
+
+
+        }
+    });
+
+});
+/****************End  Testimonial Module[End]**************/
+
+
+/****************Probono Article Module[start]**************/
+app.post('/addprobonoarticle', function (req, resp) {
+
+    var addtime=Date.now();
+    var status=1;
+
+    value1 = {title: req.body.title,link: req.body.link,priority: req.body.priority,status: status,add_time: addtime };
+    //  console.log("Insert command");
+
+
+    MongoClient.connect(url, function (err, db) {
+        if (err) {
+            //      console.log('Unable to connect to the mongoDB server. Error:', err);
+        } else {
+            //HURRAY!! We are connected. :)
+            //     console.log('Connection established to mongo db', url);
+
+
+            var collection = db.collection('probonoarticle');
+
+
+            collection.insert([value1], function (err, result) {
+                if (err) {
+                    //            console.log(err);
+                    //            console.log('err-----mingo .. vag ');
+                } else {
+                    ///          console.log('Inserted %d documents into the "users" collection. The documents inserted with "_id" are:', result.length, result);
+                    resp.send('Inserted %d documents into the "users" collection. The documents inserted with "_id" are:', result.length, result);
+
+                    db.close();
+                }
+            });
+
+
+        }
+    });
+
+
+});
+app.get('/probonoarticlelist', function (req, resp) {
+
+    MongoClient.connect(url, function (err, db) {
+        if (err) {
+            console.log('Unable to connect to the mongoDB server. Error:', err);
+        } else {
+            //HURRAY!! We are connected. :)
+            //  console.log('Connection established to mongo db', url);
+
+            var collection = db.collection('probonoarticle');
+
+            collection.find().toArray(function(err, items) {
+
+                resp.send(JSON.stringify(items));
                 db.close();
             });
 
@@ -1485,11 +1869,262 @@ app.post('/bannerlist', function (req, resp) {
 
 
 });
+app.post('/probonoarticledetails', function (req, resp) {
+    MongoClient.connect(url, function (err, db) {
+        if (err) {
+            console.log('Unable to connect to the mongoDB server. Error:', err);
+        } else {
+            //HURRAY!! We are connected. :)
+
+            //   console.log('Connection established to mongo db', url);
+
+
+            var o_id = new mongodb.ObjectID(req.body.id);
+
+            var collection = db.collection('probonoarticle');
+
+            collection.find({_id:o_id}).toArray(function(err, items) {
+
+                //     console.log(items);
+                //     console.log('-----------------------------------');
+                //    console.log(items.length);
+                resp.send(JSON.stringify(items));
+                db.close();
+
+            });
+
+        }
+    });
+
+});
+app.post('/probonoarticleupdates', function (req, resp) {
+    MongoClient.connect(url, function (err, db) {
+        if (err) {
+            console.log('Unable to connect to the mongoDB server. Error:', err);
+        } else {
+            //HURRAY!! We are connected. :)
+
+            //    console.log('Connection established to mongo db', url);
+
+
+            var o_id = new mongodb.ObjectID(req.body.id);
+
+            var collection = db.collection('probonoarticle');
+            collection.update({_id: o_id}, {$set: {title: req.body.title,testimonial: req.body.testimonial, testimonial_image: req.body.file,priority: req.body.priority }},function(err, results) {
+                if (err){
+                    resp.send("failed");
+                    throw err;
+                }
+                else {
+                    resp.send("success");
+                    db.close();
+
+                }
+            });
+
+
+        }
+    });
+
+});
+
+app.post('/probonoarticleupdatestatus', function (req, resp) {
+    MongoClient.connect(url, function (err, db) {
+        if (err) {
+            console.log('Unable to connect to the mongoDB server. Error:', err);
+        } else {
+            //HURRAY!! We are connected. :)
+
+            //      console.log('Connection established to mongo db', url);
+
+
+            var o_id = new mongodb.ObjectID(req.body.id);
+
+            var collection = db.collection('probonoarticle');
+            collection.update({_id: o_id}, {$set: {status: req.body.status}},function(err, results) {
+                if (err){
+                    resp.send("failed");
+                    throw err;
+                }
+                else {
+                    resp.send("success");
+                    db.close();
+
+                }
+            });
+
+
+        }
+    });
+
+});
+app.post('/deleteprobonoarticle', function (req, resp) {
+    MongoClient.connect(url, function (err, db) {
+        if (err) {
+            console.log('Unable to connect to the mongoDB server. Error:', err);
+        } else {
+            //HURRAY!! We are connected. :)
+
+            //    console.log('Connection established to mongo db', url);
+
+
+            var o_id = new mongodb.ObjectID(req.body.id);
+
+            var collection = db.collection('probonoarticle');
+            collection.deleteOne({_id: o_id}, function(err, results) {
+                if (err){
+                    resp.send("failed");
+                    throw err;
+                }
+                else {
+                    resp.send("success");
+                    db.close();
+
+                }
+            });
+
+
+        }
+    });
+
+});
+
+/****************End  Probono Article Module[End]**************/
+
+app.get('/imagegallerylist', function (req, resp) {
+
+    /*MongoClient.connect(url, function (err, db) {
+        if (err) {
+              console.log('Unable to connect to the mongoDB server. Error:', err);
+        } else {*/
+            //HURRAY!! We are connected. :)
+            //  console.log('Connection established to mongo db', url);
+
+            var collection = db.collection('imagegallery');
+
+            collection.find().toArray(function(err, items) {
+
+                resp.send(JSON.stringify(items));
+                db.close();
+            });
+
+
+            //db.close();
+       /* }
+    });*/
+
+
+
+
+});
+
+
+
+
+
+app.post('/imagegallerydetails', function (req, resp) {
+    MongoClient.connect(url, function (err, db) {
+        if (err) {
+               console.log('Unable to connect to the mongoDB server. Error:', err);
+        } else {
+            //HURRAY!! We are connected. :)
+
+            //   console.log('Connection established to mongo db', url);
+
+
+            var o_id = new mongodb.ObjectID(req.body.id);
+
+            var collection = db.collection('imagegallery');
+
+            collection.find({_id:o_id}).toArray(function(err, items) {
+
+                //     console.log(items);
+                //     console.log('-----------------------------------');
+                //    console.log(items.length);
+                resp.send(JSON.stringify(items));
+                db.close();
+
+            });
+
+        }
+    });
+
+});
+
+
+
+
+
+
+app.post('/deleteimagegallery', function (req, resp) {
+    MongoClient.connect(url, function (err, db) {
+        if (err) {
+                console.log('Unable to connect to the mongoDB server. Error:', err);
+        } else {
+            //HURRAY!! We are connected. :)
+
+            //    console.log('Connection established to mongo db', url);
+
+
+            var o_id = new mongodb.ObjectID(req.body.id);
+
+            var collection = db.collection('imagegallery');
+            collection.deleteOne({_id: o_id}, function(err, results) {
+                if (err){
+                    resp.send("failed");
+                    throw err;
+                }
+                else {
+                    resp.send("success");
+                    db.close();
+
+                }
+            });
+
+
+        }
+    });
+
+});
+
+
+
+/****************[End] Testimonial Module**************/
+
+
+/****************Banner Module[start]**************/
+
+app.post('/bannerlist', function (req, resp) {
+
+   /* MongoClient.connect(url, function (err, db) {
+        if (err) {
+          //  console.log('Unable to connect to the mongoDB server. Error:', err);
+        } else {
+            //HURRAY!! We are connected. :)
+          //  console.log('Connection established to mongo db', url);
+*/
+            var collection = db.collection('banner_db');
+
+            collection.find().toArray(function(err, items) {
+
+               resp.send(JSON.stringify(items));
+                //db.close();
+            });
+
+
+            //db.close();
+       // }
+    //});
+
+
+
+
+});
 
 app.post('/bannerdetails', function (req, resp) {
     MongoClient.connect(url, function (err, db) {
         if (err) {
-            //   console.log('Unable to connect to the mongoDB server. Error:', err);
+               console.log('Unable to connect to the mongoDB server. Error:', err);
         } else {
             //HURRAY!! We are connected. :)
 
@@ -1565,7 +2200,11 @@ app.post('/bannerupdates', function (req, resp) {
                     resp.send("failed");
                     throw err;
                 }
-                else resp.send("success");
+                else {
+                    resp.send("success");
+                    db.close();
+
+                }
             });
 
 
@@ -1573,6 +2212,39 @@ app.post('/bannerupdates', function (req, resp) {
     });
 
 });
+app.post('/imagegalleryupdates', function (req, resp) {
+    MongoClient.connect(url, function (err, db) {
+        if (err) {
+            //     console.log('Unable to connect to the mongoDB server. Error:', err);
+        } else {
+            //HURRAY!! We are connected. :)
+
+            //    console.log('Connection established to mongo db', url);
+
+
+            var o_id = new mongodb.ObjectID(req.body.id);
+
+            var collection = db.collection('imagegallery');
+            collection.update({_id: o_id}, {$set: {status:req.body.status,imagefile: req.body.imagefile, priority: req.body.priority,title: req.body.title }},function(err, results) {
+                if (err){
+                    resp.send("failed");
+                    throw err;
+                }
+                else {
+                    resp.send("success");
+                    db.close();
+
+                }
+            });
+
+
+        }
+    });
+
+});
+
+
+
 
 
 app.post('/bannerupdatestatus', function (req, resp) {
@@ -1593,7 +2265,11 @@ app.post('/bannerupdatestatus', function (req, resp) {
                     resp.send("failed");
                     throw err;
                 }
-                else resp.send("success");
+                else {
+                    resp.send("success");
+                    db.close();
+
+                }
             });
 
 
@@ -1601,6 +2277,41 @@ app.post('/bannerupdatestatus', function (req, resp) {
     });
 
 });
+
+
+app.post('/imagegalleryupdatestatus', function (req, resp) {
+    MongoClient.connect(url, function (err, db) {
+        if (err) {
+            //       console.log('Unable to connect to the mongoDB server. Error:', err);
+        } else {
+            //HURRAY!! We are connected. :)
+
+            //      console.log('Connection established to mongo db', url);
+
+
+            var o_id = new mongodb.ObjectID(req.body.id);
+
+            var collection = db.collection('imagegallery');
+            collection.update({_id: o_id}, {$set: {status: req.body.status}},function(err, results) {
+                if (err){
+                    resp.send("failed");
+                    throw err;
+                }
+                else {
+                    resp.send("success");
+                    db.close();
+
+                }
+            });
+
+
+        }
+    });
+
+});
+
+
+
 
 app.post('/deletebanner', function (req, resp) {
     MongoClient.connect(url, function (err, db) {
@@ -1620,7 +2331,11 @@ app.post('/deletebanner', function (req, resp) {
                     resp.send("failed");
                     throw err;
                 }
-                else resp.send("success");
+                else {
+                    resp.send("success");
+                    db.close();
+
+                }
             });
 
 
@@ -1631,6 +2346,192 @@ app.post('/deletebanner', function (req, resp) {
 
 
 /****************Banner Module[end]**************/
+
+/****************Expert Area Module[start]**************/
+
+app.post('/expertarealist', function (req, resp) {
+
+    MongoClient.connect(url, function (err, db) {
+        if (err) {
+            //  console.log('Unable to connect to the mongoDB server. Error:', err);
+        } else {
+            //HURRAY!! We are connected. :)
+            //  console.log('Connection established to mongo db', url);
+
+            var collection = db.collection('expertarea_db');
+
+            collection.find().toArray(function(err, items) {
+
+                resp.send(JSON.stringify(items));
+                db.close();
+            });
+
+
+            //db.close();
+        }
+    });
+
+
+
+
+});
+
+app.post('/expertareadetails', function (req, resp) {
+    MongoClient.connect(url, function (err, db) {
+        if (err) {
+            console.log('Unable to connect to the mongoDB server. Error:', err);
+        } else {
+            //HURRAY!! We are connected. :)
+
+            //   console.log('Connection established to mongo db', url);
+
+
+            var o_id = new mongodb.ObjectID(req.body.id);
+
+            var collection = db.collection('expertarea_db');
+
+            collection.find({_id:o_id}).toArray(function(err, items) {
+
+                //     console.log(items);
+                //     console.log('-----------------------------------');
+                //    console.log(items.length);
+                resp.send(JSON.stringify(items));
+                db.close();
+
+            });
+
+        }
+    });
+
+});
+
+app.post('/addexpertarea', function (req, resp) {
+
+    value1 = {title: req.body.title,description: req.body.description, priority: req.body.priority,status: 1};
+
+    MongoClient.connect(url, function (err, db) {
+        if (err) {
+            ///   console.log('Unable to connect to the mongoDB server. Error:', err);
+        } else {
+            //HURRAY!! We are connected. :)
+            //  console.log('Connection established to mongo db', url);
+
+
+            var collection = db.collection('expertarea_db');
+
+
+            collection.insert([value1], function (err, result) {
+                if (err) {
+                    resp.send(err);
+                } else {
+                    resp.send('Inserted %d documents into the "users" collection. The documents inserted with "_id" are:', result.length, result);
+                    db.close();
+                }
+            });
+
+
+        }
+    });
+
+
+});
+
+app.post('/expertareaupdates', function (req, resp) {
+    MongoClient.connect(url, function (err, db) {
+        if (err) {
+            //     console.log('Unable to connect to the mongoDB server. Error:', err);
+        } else {
+            //HURRAY!! We are connected. :)
+
+            //    console.log('Connection established to mongo db', url);
+
+
+            var o_id = new mongodb.ObjectID(req.body.id);
+
+            var collection = db.collection('expertarea_db');
+            collection.update({_id: o_id}, {$set: {status:req.body.status,description: req.body.description, priority: req.body.priority,title: req.body.title }},function(err, results) {
+                if (err){
+                    resp.send("failed");
+                    throw err;
+                }
+                else {
+                    resp.send("success");
+                    db.close();
+
+                }
+            });
+
+
+        }
+    });
+
+});
+
+app.post('/expertareaupdatestatus', function (req, resp) {
+    MongoClient.connect(url, function (err, db) {
+        if (err) {
+            //       console.log('Unable to connect to the mongoDB server. Error:', err);
+        } else {
+            //HURRAY!! We are connected. :)
+
+            //      console.log('Connection established to mongo db', url);
+
+
+            var o_id = new mongodb.ObjectID(req.body.id);
+
+            var collection = db.collection('expertarea_db');
+            collection.update({_id: o_id}, {$set: {status: req.body.status}},function(err, results) {
+                if (err){
+                    resp.send("failed");
+                    throw err;
+                }
+                else {
+                    resp.send("success");
+                    db.close();
+
+                }
+            });
+
+
+        }
+    });
+
+});
+
+app.post('/deleteexpertarea', function (req, resp) {
+    MongoClient.connect(url, function (err, db) {
+        if (err) {
+            //    console.log('Unable to connect to the mongoDB server. Error:', err);
+        } else {
+            //HURRAY!! We are connected. :)
+
+            //    console.log('Connection established to mongo db', url);
+
+
+            var o_id = new mongodb.ObjectID(req.body.id);
+
+            var collection = db.collection('expertarea_db');
+            collection.deleteOne({_id: o_id}, function(err, results) {
+                if (err){
+                    resp.send("failed");
+                    throw err;
+                }
+                else {
+                    resp.send("success");
+                    db.close();
+
+                }
+            });
+
+
+        }
+    });
+
+});
+
+
+
+/****************Expert Area Module[end]**************/
 
 
 
@@ -1660,6 +2561,153 @@ app.post('/upload',function(req, res){
         });
     });
 });
+
+app.post('/imageresize',function(req, res){
+
+    /*gm('/path/to/image.jpg')
+        // /!*.resize(353, 257)*!/
+        .resize(req.body.width, req.body.height)
+        .autoOrient()
+        .write(writeStream, function (err) {
+            if (!err) console.log(' hooray! ');
+        });
+    var gm = require('gm');
+
+
+    gm('./uploads/'+req.body.image)
+        .resize(req.body.width, req.body.height)
+        .write('./uploads/thumb_'+req.body.image, function (err) {
+            if (!err) console.log('done');
+        });*/
+
+    var Jimp = require("jimp");
+
+// open a file called "lenna.png"
+    Jimp.read('./uploads/'+req.body.image, function (err, lenna) {
+        if (err) throw err;
+        lenna.resize(parseInt(req.body.width), parseInt(req.body.height))            // resize
+            .quality(90)                 // set JPEG quality
+            //.greyscale()                 // set greyscale
+            .write('./uploads/thumb/'+req.body.image); // save
+    });
+
+    Jimp.read('./uploads/'+req.body.image).then(function (lenna) {
+        if (err) throw err;
+        lenna.resize(parseInt(req.body.width), parseInt(req.body.height))            // resize
+            .quality(90)                 // set JPEG quality
+            //.greyscale()                 // set greyscale
+            .write('./uploads/thumb/'+req.body.image); // save
+    }).catch(function (err) {
+        setTimeout(function () {
+            res.send({status: 1});
+        }, 4000);
+    });
+
+
+
+})
+
+app.post('/imagecrop',function(req, res){
+    console.log(req.body.imagename);
+    //console.log(req.body.rawimage);
+    var fs = require('fs');
+
+    /*fs.stat('./uploads/thumb/'+req.body.imagename, function (err, stats) {
+        console.log(stats);//here we got all information of file in stats variable
+
+        if (err) {
+            return console.error(err);
+        }
+
+        fs.unlink('./uploads/thumb/'+req.body.imagename,function(err){
+            if(err) return console.log(err);
+            console.log('file deleted successfully');
+        });
+    });*/
+    var http = require('http'),
+
+        // imgSource = 'http://upload.wikimedia.org/wikipedia/commons/1/15/Jagdschloss_Granitz_4.jpg';
+        imgSource = req.body.rawimage;
+    //imgname = Math.floor((Math.random() * 10000000) + 1)+'-'+Math.floor((Math.random() * 10000000) + 1)+'.jpg';
+    imgname = req.body.imagename;
+    console.log(imgname);
+
+    /*http.get(imgSource, function(res) {
+        res.pipe(fs.createWriteStream('.uploads/thumb/'+imgname));
+        res.send({'status':1});
+    });*/
+    //require("fs").unlink('./uploads/'+imgname);
+    var base64Data = req.body.rawimage.replace(/^data:image\/png;base64,/, "");
+
+    require("fs").writeFile('./uploads/thumb/'+imgname, base64Data, {encoding:'base64',flag:'w+'}, function(err) {
+        console.log(err);
+        //res.send({filename: 'thumb/'+imgname});
+        cropsave(imgname,req.body.width,req.body.height,res);
+
+
+    });
+
+
+
+})
+function  cropsave(imgname,w,h,res) {
+
+    var Jimp = require("jimp");
+
+// open a file called "lenna.png"
+    Jimp.read('./uploads/thumb/'+imgname, function (err, lenna) {
+        if (err) throw err;
+        lenna.resize(parseInt(w), parseInt(h))            // resize
+            .quality(90)                 // set JPEG quality
+            //.greyscale()                 // set greyscale
+            .write('./uploads/thumb/'+imgname); // save
+    });
+
+    Jimp.read('./uploads/thumb/'+imgname).then(function (lenna) {
+        if (err) throw err;
+        lenna.resize(parseInt(req.body.width), parseInt(req.body.height))            // resize
+            .quality(90)                 // set JPEG quality
+            //.greyscale()                 // set greyscale
+            .write('./uploads/thumb/'+imgname); // save
+    }).catch(function (err) {
+        setTimeout(function () {
+            res.send({filename: 'thumb/'+imgname});
+        }, 4000);
+    });
+
+}
+
+app.post('/expertareaupdates', function (req, resp) {
+    MongoClient.connect(url, function (err, db) {
+        if (err) {
+            //     console.log('Unable to connect to the mongoDB server. Error:', err);
+        } else {
+            //HURRAY!! We are connected. :)
+
+            //    console.log('Connection established to mongo db', url);
+
+
+            var o_id = new mongodb.ObjectID(req.body.id);
+
+            var collection = db.collection('expertarea_db');
+            collection.update({_id: o_id}, {$set: {status:req.body.status,description: req.body.description, priority: req.body.priority,title: req.body.title }},function(err, results) {
+                if (err){
+                    resp.send("failed");
+                    throw err;
+                }
+                else {
+                    resp.send("success");
+                    db.close();
+
+                }
+            });
+
+
+        }
+    });
+
+});
+
 
 
 var server = app.listen(port, function () {

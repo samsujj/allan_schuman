@@ -65,6 +65,7 @@
                               <div ng-repeat=" item1 in conf[item._id] track by $index" ng-bind-html="item1 |sanitizelimit"></div> ..
 
                           </td>
+
                           <td width="25%" ng-if="contenttype[item._id]=='image' "> <img src="nodeserver/uploads/{{conf[item._id]}}"></td>
                           <td width="25%"> {{contenttype[item.id]}} </td>
                           <td width="25%"> {{item.description |sanitizelimit}} </td>

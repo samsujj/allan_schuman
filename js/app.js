@@ -10,7 +10,16 @@ function canJSON(value) {
     }
 }
 /* App Module */
-var r1headzappvar = angular.module('r1headzapp', ['app2','common_module_app','user_module_app','admin_module_app','media_module_app','media_article_module_app','stuff_module_app','admin_common_module_app','banner_module_app','ui.router','angularValidator','ngCookies','ui.bootstrap','ngFileUpload','ui.tinymce','youtube-embed','angularLazyImg']);
+var r1headzappvar = angular.module('r1headzapp', ['app2','common_module_app','user_module_app','admin_module_app','media_module_app','media_article_module_app','stuff_module_app','admin_common_module_app','banner_module_app','gallery_module_app','testimonial_module_app','probonoarticle_module_app','expertarea_module_app','ui.router','angularValidator','ngCookies','ui.bootstrap','ngFileUpload','ui.tinymce','youtube-embed','angularLazyImg','bootstrapLightbox','ngMeta']);
+
+
+/*r1headzappvar.module('YourApp', ['ngRoute', 'ngMeta'])
+    .config(function($routeProvider, ngMetaProvider) {
+        ....
+    })
+    .run(['ngMeta', function(ngMeta) {
+        ngMeta.init();
+    }]);*/
 
 r1headzappvar.run(['$rootScope', '$state','contentservice','$uibModal','$log',function($rootScope, $state,contentservice,$uibModal,$log){
 
@@ -19,6 +28,16 @@ r1headzappvar.run(['$rootScope', '$state','contentservice','$uibModal','$log',fu
     });
 
     $rootScope.$on('$stateChangeSuccess',function(ev, to, toParams, from, fromParams) {
+
+        $rootScope.metatitle='Personal Injury and Worker\'s Comp Lawyers/Attorneys in San Fransisco, San Jose, Oakland, Fairfield, Martinez, Napa, Redwood City, San Refael, Santa Rosa. Allan M. Schuman and Associates Law Firm - Personal Injury, Worker\'s Compensation, Personal Law, Immigration, Bankruptcy, Workplace Injury, Family Law, State Law, Education Law, Tax, Property Law';
+
+        $rootScope.metadescription='Personal Injury and Worker\'s Comp Lawyers in San Fransisco - Allan M. Schuman and Associates Law Firm specializes in Personal Injury, Worker\'s Compensation, Personal Law, Immigration, Bankruptcy, Workplace Injury, Family Law, State Law, Education Law, Tax, Property Law';
+        $rootScope.metakeywords='Personal Injury, Worker\'s Compensation, Personal Law, Immigration, Bankruptcy, Workplace Injury, Family Law, State Law, Education Law, Tax, Property Law';
+        $rootScope.robots='all, index, follow';
+        $rootScope.author='Allan M. Schuman';
+        $rootScope.distribution='San Fransisco, San Fransisco County, San Jose, San Jose County, Oakland, Fairfield, Martinez, Napa, Redwood City, San Refael, Santa Rosa, Northern California, California, Florida, Illinois';
+        $rootScope.revisitafter='14 days';
+
         $rootScope.stateIsLoading = false;
         $rootScope.previousState = from.name;
         $rootScope.currentState = to.name;
@@ -27,7 +46,7 @@ r1headzappvar.run(['$rootScope', '$state','contentservice','$uibModal','$log',fu
 
         $rootScope.refreshcontent=function(){
             if (typeof (data) != 'undefined') unset(data);
-            $rootScope.interval = 600;
+            $rootScope.interval = 2300;
             $rootScope.contentupdated = false;
             //var data=contentservice.getcontent( $rootScope.adminUrl+'listcontent');
             var myVar = setInterval(function () {
@@ -57,7 +76,7 @@ r1headzappvar.run(['$rootScope', '$state','contentservice','$uibModal','$log',fu
                         $rootScope.tempval.content = $rootScope.contentvalue;
                     }
                     else {
-                        $rootScope.tempval.content = "<img src = nodeserver/uploads/" + value.content + " /> ";
+                        $rootScope.tempval.content = "<img src = nodeserver/uploads/" + value.content +'?v='+(new Date).getTime()+ " /> ";
                     }
                     $rootScope.contentlist.splice(value._id, 0, $rootScope.tempval);
                     $rootScope.conf[value._id] = $rootScope.tempval.content;
@@ -114,7 +133,7 @@ r1headzappvar.run(['$rootScope', '$state','contentservice','$uibModal','$log',fu
     $rootScope.animationsEnabled = true;
 
     $rootScope.opencontentmodal = function (size,id) {
-
+$('.imgclass').css('display','none');
       //  console.log('in openmodal');
 
       // if($rootScope.userid!=0) {
@@ -185,6 +204,34 @@ r1headzappvar.filter('limitText', ['$sce',function($sce) {
     }
 }]);
 
+r1headzappvar.filter('newline', function($sce) {
+    return function(text) {
+        text = text.replace(/\n/g, '<br />');
+        return $sce.trustAsHtml(text);
+    }
+});
+
+
+
+r1headzappvar.directive('loadedImg', function(){
+    return {
+        restrict: 'E',
+        scope: {
+            isrc: '=',
+            onloadimg: '&'
+        },
+        replace: true,
+        template: '<img ng-src="{{isrc}}" class="none"/>',
+        link: function(scope, ele, attr){
+            ele.on('load', function(){
+                console.log(scope.isrc, 'loaded');
+                ele.removeClass('none');
+                scope.onloadimg();
+            });
+        }
+    };
+});
+
 r1headzappvar.directive('content',['$compile','$sce','$state','$rootScope', function($compile,$sce,$state,$rootScope) {
     var directive = {};
     directive.restrict = 'E';
@@ -203,14 +250,16 @@ r1headzappvar.directive('content',['$compile','$sce','$state','$rootScope', func
             $(element).bind("DOMSubtreeModified",function(){
                 setTimeout(function(){
                    // $(element).find('.editableicon').css('position','absolute').css('top',parseFloat($(element).offset().top+$(element).height()-30)).css('left',parseFloat($(element).offset().left+$(element).width()-40));
-                    $(element).find('.editableicon').css('position','absolute').css('top',0).css('right',0);
-                    //console.log($(element).height());
+                    $(element).find('.editableicon').css('position','absolute').css('top',0).css('right',30);
+                    if($(element).attr('id')=='57bd70fe6d2917be592c2de0') $(element).find('.editableicon').css('position','absolute').css('top',0).css('left',30);
+                    //console.log($(element).height())
                    // console.log($(element).next().width());
                 },1000);
 
               //  console.log('changed');
             });
             $(element).find('.editableicon').on( "click", function() {
+                $('.imgclass').css('display','none');
                 //console.log('in edit event ..');
                 $rootScope.opencontentmodal('lg',$( this ).parent().attr('id'));
             });
@@ -239,7 +288,7 @@ r1headzappvar.filter("sanitizelimit", ['$sce', function($sce) {
     }
 }]);
 
-r1headzappvar.config(function($stateProvider, $urlRouterProvider,$locationProvider) {
+r1headzappvar.config(function($stateProvider, $urlRouterProvider,$locationProvider,ngMetaProvider) {
     $urlRouterProvider
         .otherwise("/home");
 
@@ -247,6 +296,11 @@ r1headzappvar.config(function($stateProvider, $urlRouterProvider,$locationProvid
     $stateProvider
         .state('home',{
             url:"/home",
+            meta: {
+                'title': 'Login page',
+                'titleSuffix': ' | Login to YourSiteName',
+                'description': 'Login to the site'
+            },
             views: {
 
                 'content': {
@@ -268,6 +322,30 @@ r1headzappvar.config(function($stateProvider, $urlRouterProvider,$locationProvid
             }
         }
     )
+
+        .state('slider-video',{
+                url:"/slider-video",
+                views: {
+
+                    'content': {
+                        templateUrl: 'partial/slidertest.html' ,
+                        controller: 'test'
+                    },
+                    'header': {
+                        templateUrl: 'partial/header.html' ,
+                        controller: 'header'
+                    },
+                    'footer': {
+                       // templateUrl: 'partial/footer.html' ,
+                        controller: 'header'
+                    },
+                    'modalview': {
+                      //  templateUrl: 'partial/modalview.html' ,
+                      //  controller: 'test'
+                    }
+                }
+            }
+        )
         .state('test',{
                 url:"/test",
                 views: {
@@ -358,7 +436,7 @@ r1headzappvar.config(function($stateProvider, $urlRouterProvider,$locationProvid
                     },
                     'modalview': {
                         templateUrl: 'partial/modalview.html' ,
-                        controller: 'areasofexpertise'
+                        //controller: 'areasofexpertise'
                     },
                 }
             }
@@ -505,6 +583,78 @@ r1headzappvar.config(function($stateProvider, $urlRouterProvider,$locationProvid
                 }
             }
         )
+        .state('probonopopupvideo',{
+                url:"/probonopopupvideo/:iframeurl",
+                views: {
+
+                    'content': {
+                        templateUrl: 'partial/probonopopup.html' ,
+                        controller: 'probonopopup'
+                    },
+                    'header': {
+                        templateUrl: 'partial/header.html' ,
+                        controller: 'header'
+                    },
+                    'footer': {
+                        templateUrl: 'partial/footer.html' ,
+                        controller: 'header'
+                    },
+                    'modalview': {
+                        templateUrl: 'partial/modalview.html' ,
+                        controller: 'probono'
+                    },
+                }
+            }
+        )
+
+
+        .state('testimonial',{
+            url:"/testimonials",
+            views: {
+
+                'content': {
+                    templateUrl: 'partial/testimonial.html' ,
+                    controller: 'testimonial'
+                },
+                'header': {
+                    templateUrl: 'partial/header.html' ,
+                    controller: 'header'
+                },
+                'footer': {
+                    templateUrl: 'partial/footer.html' ,
+                    controller: 'header'
+                },
+                'modalview': {
+                    templateUrl: 'partial/modalview.html' ,
+                    // controller: 'probono'
+                },
+            }
+        }
+    )
+
+        .state('sfactivities',{
+                url:"/SF-Activities",
+            views: {
+
+                'content': {
+                    templateUrl: 'partial/imagegallery.html' ,
+                    controller: 'imagegallery'
+                },
+                'header': {
+                    templateUrl: 'partial/header.html' ,
+                    controller: 'header'
+                },
+                'footer': {
+                    templateUrl: 'partial/footer.html' ,
+                    controller: 'header'
+                },
+                'modalview': {
+                    templateUrl: 'partial/modalview.html' ,
+                    //controller: 'imagegallery'
+                },
+            }
+        }
+    )
         .state('contact',{
                 url:"/contact",
                 views: {
@@ -702,6 +852,151 @@ r1headzappvar.config(function($stateProvider, $urlRouterProvider,$locationProvid
                 }
             }
         )
+
+        .state('testimonial-list',{
+                url:"/testimonial-list",
+                views: {
+
+                    'admin_header': {
+                        templateUrl: 'partial/admin_top_menu.html' ,
+                        controller: 'admin_header'
+                    },
+                    'admin_left': {
+                        templateUrl: 'partial/admin_left.html' ,
+                        //  controller: 'admin_left'
+                    },
+                    'admin_footer': {
+                        templateUrl: 'partial/admin_footer.html' ,
+                    },
+                    'content': {
+                        templateUrl: 'partial/testimonial/testimonial_list.html' ,
+                        controller: 'testimoniallist'
+                    },
+
+                }
+            }
+        )
+
+        .state('add-testimonial',{
+                url:"/add-testimonial",
+                views: {
+
+                    'admin_header': {
+                        templateUrl: 'partial/admin_top_menu.html' ,
+                        controller: 'admin_header'
+                    },
+                    'admin_left': {
+                        templateUrl: 'partial/admin_left.html' ,
+                        //  controller: 'admin_left'
+                    },
+                    'admin_footer': {
+                        templateUrl: 'partial/admin_footer.html' ,
+                    },
+                    'content': {
+                        templateUrl: 'partial/testimonial/add_testimonial.html' ,
+                        controller: 'addtestimonial'
+                    },
+
+                }
+            }
+        )
+
+        .state('edit-testimonial',{
+                url:"/edit-testimonial/:id",
+                views: {
+
+                    'admin_header': {
+                        templateUrl: 'partial/admin_top_menu.html' ,
+                        controller: 'admin_header'
+                    },
+                    'admin_left': {
+                        templateUrl: 'partial/admin_left.html' ,
+                    },
+                    'admin_footer': {
+                        templateUrl: 'partial/admin_footer.html' ,
+                    },
+                    'content': {
+                        templateUrl: 'partial/testimonial/edit_testimonial.html' ,
+                        controller: 'edittestimonial'
+                    },
+
+                }
+            }
+        )
+
+
+        .state('probonoarticle-list',{
+                url:"/probonoarticle-list",
+                views: {
+
+                    'admin_header': {
+                        templateUrl: 'partial/admin_top_menu.html' ,
+                        controller: 'admin_header'
+                    },
+                    'admin_left': {
+                        templateUrl: 'partial/admin_left.html' ,
+                        //  controller: 'admin_left'
+                    },
+                    'admin_footer': {
+                        templateUrl: 'partial/admin_footer.html' ,
+                    },
+                    'content': {
+                        templateUrl: 'partial/probonoarticle/probonoarticle_list.html' ,
+                        controller: 'probonoarticlelist'
+                    },
+
+                }
+            }
+        )
+
+        .state('add-probonoarticle',{
+                url:"/add-probonoarticle",
+                views: {
+
+                    'admin_header': {
+                        templateUrl: 'partial/admin_top_menu.html' ,
+                        controller: 'admin_header'
+                    },
+                    'admin_left': {
+                        templateUrl: 'partial/admin_left.html' ,
+                        //  controller: 'admin_left'
+                    },
+                    'admin_footer': {
+                        templateUrl: 'partial/admin_footer.html' ,
+                    },
+                    'content': {
+                        templateUrl: 'partial/probonoarticle/add_probonoarticle.html' ,
+                        controller: 'addprobonoarticle'
+                    },
+
+                }
+            }
+        )
+
+        .state('edit-probonoarticle',{
+                url:"/edit-probonoarticle/:id",
+                views: {
+
+                    'admin_header': {
+                        templateUrl: 'partial/admin_top_menu.html' ,
+                        controller: 'admin_header'
+                    },
+                    'admin_left': {
+                        templateUrl: 'partial/admin_left.html' ,
+                    },
+                    'admin_footer': {
+                        templateUrl: 'partial/admin_footer.html' ,
+                    },
+                    'content': {
+                        templateUrl: 'partial/probonoarticle/edit_probonoarticle.html' ,
+                        controller: 'editprobonoarticle'
+                    },
+
+                }
+            }
+        )
+
+
         .state('stuff-list',{
                 url:"/staff-list",
                 views: {
@@ -910,6 +1205,148 @@ r1headzappvar.config(function($stateProvider, $urlRouterProvider,$locationProvid
                 'content': {
                     templateUrl: 'partial/banner/edit_banner.html' ,
                     controller: 'editbanner'
+                },
+
+            }
+        }
+    )
+
+        .state('gallery-list',{
+            url:"/gallery-list",
+            views: {
+
+                'admin_header': {
+                    templateUrl: 'partial/admin_top_menu.html' ,
+                    controller: 'admin_header'
+                },
+                'admin_left': {
+                    templateUrl: 'partial/admin_left.html' ,
+                    //  controller: 'admin_left'
+                },
+                'admin_footer': {
+                    templateUrl: 'partial/admin_footer.html' ,
+                },
+                'content': {
+                    templateUrl: 'partial/gallery/list.html' ,
+                    controller: 'gallerylist'
+                },
+
+            }
+        }
+    )
+
+        .state('add-gallery',{
+            url:"/add-gallery",
+            views: {
+
+                'admin_header': {
+                    templateUrl: 'partial/admin_top_menu.html' ,
+                    controller: 'admin_header'
+                },
+                'admin_left': {
+                    templateUrl: 'partial/admin_left.html' ,
+                    //  controller: 'admin_left'
+                },
+                'admin_footer': {
+                    templateUrl: 'partial/admin_footer.html' ,
+                },
+                'content': {
+                    templateUrl: 'partial/gallery/add.html' ,
+                    controller: 'addgallery'
+                },
+
+            }
+        }
+    )
+
+        .state('edit-gallery',{
+            url:"/edit-gallery/:id",
+            views: {
+
+                'admin_header': {
+                    templateUrl: 'partial/admin_top_menu.html' ,
+                    controller: 'admin_header'
+                },
+                'admin_left': {
+                    templateUrl: 'partial/admin_left.html' ,
+                },
+                'admin_footer': {
+                    templateUrl: 'partial/admin_footer.html' ,
+                },
+                'content': {
+                    templateUrl: 'partial/gallery/edit.html' ,
+                    controller: 'editgallery'
+                },
+
+            }
+        }
+    )
+
+        .state('expertarea-list',{
+            url:"/expertarea-list",
+            views: {
+
+                'admin_header': {
+                    templateUrl: 'partial/admin_top_menu.html' ,
+                    controller: 'admin_header'
+                },
+                'admin_left': {
+                    templateUrl: 'partial/admin_left.html' ,
+                    //  controller: 'admin_left'
+                },
+                'admin_footer': {
+                    templateUrl: 'partial/admin_footer.html' ,
+                },
+                'content': {
+                    templateUrl: 'partial/expertarea/list.html' ,
+                    controller: 'expertarealist'
+                },
+
+            }
+        }
+    )
+
+        .state('add-expertarea',{
+            url:"/add-expertarea",
+            views: {
+
+                'admin_header': {
+                    templateUrl: 'partial/admin_top_menu.html' ,
+                    controller: 'admin_header'
+                },
+                'admin_left': {
+                    templateUrl: 'partial/admin_left.html' ,
+                    //  controller: 'admin_left'
+                },
+                'admin_footer': {
+                    templateUrl: 'partial/admin_footer.html' ,
+                },
+                'content': {
+                    templateUrl: 'partial/expertarea/add.html' ,
+                    controller: 'addexpertarea'
+                },
+
+            }
+        }
+    )
+
+        .state('edit-expertarea',{
+            url:"/edit-expertarea/:id",
+            views: {
+
+                'admin_header': {
+                    templateUrl: 'partial/admin_top_menu.html' ,
+                    controller: 'admin_header'
+                },
+                'admin_left': {
+                    templateUrl: 'partial/admin_left.html' ,
+                },
+                'admin_footer': {
+                    templateUrl: 'partial/admin_footer.html' ,
+                },
+                'content': {
+                    templateUrl: 'partial/expertarea/edit.html' ,
+                    controller: 'editexpertarea'
                 },
 
             }
@@ -1142,12 +1579,17 @@ r1headzappvar.config(function($stateProvider, $urlRouterProvider,$locationProvid
         requireBase: false,
         hashPrefix:'!'
     });
-});
+
+
+
+}).run(['ngMeta', function(ngMeta) {
+    ngMeta.init();
+}]);
 
 
 
 
-r1headzappvar.controller('homenew', function($compile,$scope,$state,$http,$cookieStore,$rootScope,Upload,$sce,$stateParams,$window) {
+r1headzappvar.controller('homenew', function($compile,$scope,$state,$http,$cookieStore,$rootScope,Upload,$sce,$stateParams,$window,$q) {
 
     /*$('#carousel-example-generic').carousel();
     setInterval(function(){
@@ -1174,6 +1616,9 @@ r1headzappvar.controller('homenew', function($compile,$scope,$state,$http,$cooki
     },12);*/
 
 
+    var deferred;
+    var dArr = [];
+    var imgpaths = [];
     $http({
         method  : 'POST',
         async:   false,
@@ -1182,28 +1627,46 @@ r1headzappvar.controller('homenew', function($compile,$scope,$state,$http,$cooki
         headers : { 'Content-Type': 'application/x-www-form-urlencoded' }
     }) .success(function(data) {
         $rootScope.stateIsLoading = false;
-        $scope.bannerlist=data;
+        //$scope.bannerlist=data;
+
+        angular.forEach(data, function(value, key){
+            //
+            deferred = $q.defer();
+            imgpaths.push({
+                path: $scope.baseUrl+'nodeserver/uploads/'+value.bannerfile,
+                priority: value.priority,
+                status: value.status,
+                bannerfile: value.bannerfile,
+                callback: deferred.resolve
+            });
+            dArr.push(deferred.promise);
+            console.log('all added'+$scope.baseUrl+'nodeserver/uploads/'+value.bannerfile);
+
+        });
+
+
+        $scope.bannerlist = imgpaths;
+
+        $scope.hideall = true;
+
+        $q.all(dArr).then(function(){
+            $scope.hideall = false;
+            console.log('all loaded');
+
+
+            /*----------------*/
 
 
 
-        $('.item >.active > .homebannerblock').css('transition', 'transform 5000ms linear 0s').css('transform', 'scale(1.05, 1.05)');
-        $('#carousel-example-generic').hide();
+            $('.item >.active > .homebannerblock').css('transition', 'transform 5000ms linear 0s').css('transform', 'scale(1.05, 1.05)');
+            $('#carousel-example-generic').hide();
 
-        $scope.valsc=0;
-        $('link[href="css/animate.min.css"]').prop('disabled', true);
-        /*item.active .homebannerblock {
-         transition: transform 5000ms linear 0s;
-         *//* This should be based on your carousel setting. For bs, it should be 5second*//*
-         transform: scale(1.05, 1.05);*/
-        //$('.item').eq(0).addClass('active');
-        //$('#carousel-example-generic').carousel('next');
-        setTimeout(function(){
+            $scope.valsc=0;
+            $('link[href="css/animate.min.css"]').prop('disabled', true);
+
             $('.item:first').addClass('active');
-
-
-            //$("#myCarousel").carousel('destroy');
-            //$('#carousel-example-generic').carousel();
-            //$('#carousel-example-generic').carousel('next');
+            setTimeout(function(){
+            console.log($('.item').length+'item width');
 
 
             var t;
@@ -1219,7 +1682,7 @@ r1headzappvar.controller('homenew', function($compile,$scope,$state,$http,$cooki
                 if(slideFrom==c-1) {
                     //$('.item').eq(0).hide();
                     /* $('.item').eq(0).removeClass('active');
-                     $('.item').eq(1).addClass('active');*/
+                         $('.item').eq(1).addClass('active');*/
 
                     setTimeout(function(){
                         $('#carousel-example-generic').carousel(1);
@@ -1232,7 +1695,7 @@ r1headzappvar.controller('homenew', function($compile,$scope,$state,$http,$cooki
                 if(slideFrom==1) {
                     //$('.item').eq(0).hide();
                     /* $('.item').eq(0).removeClass('active');
-                     $('.item').eq(1).addClass('active');*/
+                         $('.item').eq(1).addClass('active');*/
 
                     setTimeout(function(){
                         $('#carousel-example-generic').carousel(2);
@@ -1252,40 +1715,46 @@ r1headzappvar.controller('homenew', function($compile,$scope,$state,$http,$cooki
             });
 
 
-            $('.carousel-control.right').on('click', function(){
-                clearTimeout(t);
-            });
+                $('.carousel-control.right').on('click', function(){
+                    clearTimeout(t);
+                });
 
-            $('.carousel-control.left').on('click', function() {
-                clearTimeout(t)
-            });
+                $('.carousel-control.left').on('click', function() {
+                    clearTimeout(t)
+                });
 
-            $('#carousel-example-generic').carousel(1);
-            $('#carousel-example-generic').carousel(1);
-            $('#carousel-example-generic').show();
+                $('#carousel-example-generic').carousel(1);
+                $('#carousel-example-generic').carousel(1);
+                $('#carousel-example-generic').show();
 
-            var c=$('.item').length;
+                var c=$('.item').length;
 
-            $('#carousel-example-generic').on('slide',function(e){
-                var slideFrom = $(this).find('.active').index();
-                var slideTo = $(e.relatedTarget).index();
-                if(slideFrom==c-2) {
-                    //$('.item').eq(0).hide();
-                    $('.item').eq(0).removeClass('active');
-                    $('.item').eq(1).addClass('active');
-                    $('#carousel-example-generic').carousel(1);
-                    //$('.item').eq(0).show();
-                    console.log(slideFrom+' => '+slideTo+'c=='+c+'slideFrom='+slideFrom+'ccccccccccccccc1');
-                }
+                $('#carousel-example-generic').on('slide',function(e){
+                    var slideFrom = $(this).find('.active').index();
+                    var slideTo = $(e.relatedTarget).index();
+                    if(slideFrom==c-2) {
+                        //$('.item').eq(0).hide();
+                        $('.item').eq(0).removeClass('active');
+                        $('.item').eq(1).addClass('active');
+                        $('#carousel-example-generic').carousel(1);
+                        //$('.item').eq(0).show();
+                        console.log(slideFrom+' => '+slideTo+'c=='+c+'slideFrom='+slideFrom+'ccccccccccccccc1');
+                    }
 
-            });
-
-
+                });
 
 
 
 
-        },100);
+
+
+            },1000);
+
+
+            /*------*/
+        });
+
+
 
 
 
@@ -1461,7 +1930,8 @@ r1headzappvar.controller('addcontent', function($compile,$scope,$state,$http,$co
             url: $scope.adminUrl+'uploads',//webAPI exposed to upload the file
             data:{file:file} //pass file as data, should be user ng-model
         }).then(function (response) { //upload function returns a promise
-            if(response.data.error_code === 0){ //validate success
+            console.log(response);
+            if(response.data.error_code == 0){ //validate success
                 //console.log('Success ' + resp.config.data.file.name + 'uploaded. Response: ');
 
                 console.log(response.data.filename);
@@ -1690,9 +2160,33 @@ r1headzappvar.controller('contentlist', function($scope,$state,$http,$cookieStor
 });
 
 
-r1headzappvar.controller('editcontent', function(contentservice,$compile,$scope,$state,$http,$cookieStore,$rootScope,Upload,$sce,$stateParams,$uibModalInstance,items) {
+r1headzappvar.controller('editcontent', function(contentservice,$compile,$scope,$state,$http,$cookieStore,$rootScope,Upload,$sce,$stateParams,$uibModal,$uibModalInstance,$timeout,items) {
+    //$('.imgclass').css('display','none');
+    if(typeof (items)=='undefined')$scope.id=$stateParams.id;
+    else $scope.id=items;
+    //$timeout(function(){
+        //$('.editableicon').each(function(){
+            console.log($scope.id);
+            var imgwidth=$('#'+$scope.id).attr('imgwidth');
+            var imgheight=$('#'+$scope.id).attr('imgheight');
+            $rootScope.imgwidth=imgwidth;
+            $rootScope.imgheight=imgheight;
+            //$('.imagecropdivcontent').css('height',$rootScope.imgheight);
+            //$('.imagecropdivcontent').css('width',$rootScope.imgwidth);
+        //})
 
-    console.log('6789');
+
+    //},2000);
+
+console.log($rootScope.imgwidth);
+console.log($rootScope.imgheight);
+console.log(99);
+    console.log('111');
+    $scope.loadershow=true;
+    $scope.progressshow=true;
+    $scope.isDisabled = false;
+    $scope.submitload = false;
+
     $scope.ok = function () {
         $uibModalInstance.close();
     };
@@ -1705,8 +2199,7 @@ r1headzappvar.controller('editcontent', function(contentservice,$compile,$scope,
     $scope.form.resumearrn = new Array();
     $scope.form.resumearrp = new Array();
     $scope.form.resume = null;;
-    if(typeof (items)=='undefined')$scope.id=$stateParams.id;
-    else $scope.id=items;
+
 
     $http({
         method  : 'GET',
@@ -1715,13 +2208,6 @@ r1headzappvar.controller('editcontent', function(contentservice,$compile,$scope,
         data    : $.param({'id':$scope.userid}),  // pass in data as strings
         headers : { 'Content-Type': 'application/x-www-form-urlencoded' }
     }) .success(function(data) {
-        console.log(data.length);
-        console.log('===============');
-        console.log(data[data.length-1]._id);
-        console.log('....................');
-        console.log(data);
-        //console.log($scope.form);
-        console.log('after form');
         $rootScope.currentlistdata=data;
         $scope.form = {
             cname: data[data.length-1].cname,
@@ -1729,11 +2215,6 @@ r1headzappvar.controller('editcontent', function(contentservice,$compile,$scope,
             description: data[data.length-1].description,
             parentid:data[data.length-1]._id
         }
-
-        console.log('888');
-        console.log($scope.form);
-        console.log('$$$$$$$$$$$$$$');
-        console.log(data[data.length-1]._id);
         if( (data[data.length-1].parentid)!=0) $scope.form.parentid=data[data.length-1].parentid;
         if(data[data.length-1].ctype!='image') {
             data[data.length-1].content = JSON.parse(data[data.length-1].content);
@@ -1755,7 +2236,10 @@ r1headzappvar.controller('editcontent', function(contentservice,$compile,$scope,
         if(data[data.length-1].ctype=='image'){
             $scope.form.cimage=data[data.length-1].content;
             $scope.form.resume=data[data.length-1].content;
+            /*$scope.form.image_url_url=data[data.length-1].content;*/
             $scope.form.image_url_url=data[data.length-1].content;
+            console.log(data[data.length-1].content);
+            $scope.imgsrc1=data[data.length-1].content;
             $scope.cimage=true;
             $scope.form.ismultiple='no';
         }
@@ -1903,8 +2387,35 @@ r1headzappvar.controller('editcontent', function(contentservice,$compile,$scope,
         }).then(function (response) { //upload function returns a promise
             if(response.data.error_code === 0){ //validate success
                 //console.log('Success ' + resp.config.data.file.name + 'uploaded. Response: ');
-
+                //$('.imgclass').css('display','none');
+                $scope.loadershow=true;
+                $scope.progressshow=false;
                 console.log(response.data.filename);
+                $scope.form.file=response.data.filename;
+
+                //console.log('Success ' + resp.config.data.file.name + 'uploaded. Response: ');
+                $scope.form.image_url_url=response.data.filename;
+                $scope.imgsrc1=response.data.filename;
+                console.log($scope.imgsrc);
+
+
+
+                $http({
+                    method  : 'POST',
+                    async:   false,
+                    url     : $scope.adminUrl+'imageresize',
+                    data    : $.param({'image':response.data.filename,'width':$rootScope.imgwidth,'height':$rootScope.imgheight}),  // pass in data as strings
+                    headers : { 'Content-Type': 'application/x-www-form-urlencoded' }
+                }) .success(function(data1) {
+                    // $state.go('banner-list');
+                    // return;
+                    console.log($scope.imgsrc);
+                    $scope.progressshow=true;
+                    $scope.form.image_url_url='thumb/'+response.data.filename;
+                    $scope.imgsrc1=response.data.filename;
+                    //$scope.imagecrop();
+
+                });
 
                 $('.progress').removeClass('ng-hide');
                 file.result = response.data;
@@ -1940,6 +2451,9 @@ r1headzappvar.controller('editcontent', function(contentservice,$compile,$scope,
             var progressPercentage = parseInt(100.0 * evt.loaded / evt.total);
             console.log('progress: ' + progressPercentage + '% ' + evt.config.data.file.name);
             //vm.progress = 'progress: ' + progressPercentage + '% '; // capture upload progress
+            //$('.multipleimgclass').css('display','block');
+            $scope.loadershow=false;
+            $scope.progressshow=true;
         });
     };
 
@@ -1973,7 +2487,8 @@ r1headzappvar.controller('editcontent', function(contentservice,$compile,$scope,
     }
 
     $scope.submitadminForm=function(){
-
+        $scope.isDisabled = true;
+        $scope.submitload = true;
 
         if($scope.chtml == true ){
 
@@ -1999,7 +2514,15 @@ r1headzappvar.controller('editcontent', function(contentservice,$compile,$scope,
                 $rootScope.refreshcontent();
                 setTimeout(function(){
                     $rootScope.refreshcontent();
+                    $rootScope.refreshcontent();
+
+                    $state.transitionTo($state.current, $stateParams, {
+                        reload: true, inherit: false, notify: true
+                    });
                     $scope.cancel();
+                    $scope.isDisabled = false;
+                    $scope.submitload = false;
+
                 },1900);
             }
             else{
@@ -2028,7 +2551,7 @@ r1headzappvar.controller('editcontent', function(contentservice,$compile,$scope,
         }
         if($scope.cimage == true ){
 
-            $scope.previewcontent="<img src=nodeserver/uploads/"+$scope.form.image_url_url+" /> ";
+            $scope.previewcontent="<img src=nodeserver/uploads/"+$scope.form.image_url_url+'?v='+(new Date).getTime()+ " /> ";
 
         }
     }
@@ -2078,13 +2601,100 @@ r1headzappvar.controller('editcontent', function(contentservice,$compile,$scope,
             $scope.form.cimage=$scope.contenetselected.content;
             $scope.form.resume=$scope.contenetselected.content;
             $scope.form.image_url_url=$scope.contenetselected.content;
+            console.log($scope.contenetselected.content);
+            //$scope.imgsrc1=$scope.contenetselected.content;
             $scope.cimage=true;
             $scope.ctext=false;
             $scope.chtml=false;
             $scope.form.ismultiple='no';
-            $scope.previewcontent="<img src=nodeserver/uploads/"+$scope.form.image_url_url+" /> ";
+            $scope.previewcontent="<img src=nodeserver/uploads/"+$scope.form.image_url_url+'?v='+(new Date).getTime()+" /> ";
         }
+
+        $state.transitionTo($state.current, $stateParams, {
+            reload: true, inherit: false, notify: true
+        });
     }
+
+
+
+
+    var modalInstance;
+    $scope.modalClose = function(){
+        modalInstance.dismiss('cancel');
+    }
+    $scope.imagecrop=function(){
+        //$('.imagecropdivcontent').css('height',$rootScope.imgheight);
+        //$('.imagecropdivcontent').css('width',$rootScope.imgwidth);
+        $scope.pLoad = true;
+        $scope.cropsaveDisabled=false;
+
+        $scope.animationsEnabled = true;
+        modalInstance = $uibModal.open({
+            animation: $scope.animationsEnabled,
+            templateUrl: 'commonmymodal1',
+            windowClass: 'mymodalimg',
+            size: 'lg',
+            scope : $scope
+        });
+
+
+        $scope.imgsrc2=$scope.imgsrc1.toString().replace('thumb/','');
+        $scope.imagefullpath='nodeserver/uploads/'+$scope.imgsrc2+'?v='+(new Date).getTime();
+
+
+        console.log($scope.imagefullpath);
+        console.log('ddsd');
+        $timeout(function(){
+            //$('.imagecropdivcontent').css('height',$rootScope.imgheight);
+            //$('.imagecropdivcontent').css('width',$rootScope.imgwidth);
+
+            $('.image-editor1').cropit({
+                //exportZoom:parseFloat($rootScope.imgwidth/765),
+                exportZoom:1,
+                width:$rootScope.imgwidth,
+                height:$rootScope.imgheight,
+                imageBackground: true,
+                imageBackgroundBorderWidth: 30,
+                imageState: {
+                    //  src: $scope.subUrl+'/uploads/user_image/background/'+$scope.origprofileBackImageName,
+                    src: $scope.imagefullpath,
+                },
+            });
+            $scope.pLoad = false;
+        },5000);
+    }
+    $scope.changepreview1 = function(){
+        $scope.imagedata2 = $('.image-editor1').cropit('export');
+    }
+
+    $scope.crop1=function(){
+        $scope.cropsaving=true;
+        var imagedata = $('.image-editor1').cropit('export');
+        $scope.cropsaveDisabled=true;
+        $http({
+            method  : 'POST',
+            async:   false,
+            url     : $scope.adminUrl+'imagecrop',
+            data    : $.param({'rawimage':imagedata,'imagename':$scope.imgsrc2,'width':$rootScope.imgwidth,'height':$rootScope.imgheight}),  // pass in data as strings
+            headers : { 'Content-Type': 'application/x-www-form-urlencoded' }
+        }) .success(function(data1) {
+            var ctime=(new Date).getTime();
+
+            $scope.cropsaving=false;
+            $scope.cropsaveDisabled=false;
+            $scope.imgsrc1=data1.filename;
+            $scope.form.cimage=data1.filename;
+            $scope.form.image_url_url=data1.filename+'?version='+ctime;
+            $scope.cropsaving=false;
+            modalInstance.dismiss('cancel');
+            //$scope.form.image_url_url='thumb/'+$scope.imgsrc1+'?version='+ctime;
+
+
+        });
+
+
+    }
+
 });
 
 

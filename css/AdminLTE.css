@@ -5233,7 +5233,7 @@ table.text-center th {
 
 
 
-.newblock1 .addfrinderbtn{ width: 100px; height: 30px; float: right; margin-left:20px;      color: #fff!important;
+.newblock1 .addfrinderbtn{ minwidth: 100px; padding:0 10px; height: 30px; float: right; margin-left:20px;      color: #fff!important;
 
 
 
